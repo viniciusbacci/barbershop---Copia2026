@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const fsPromises = require("node:fs/promises");
 const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
-
+const cors = require("cors");
 const PORTA = Number(process.env.PORT) || 3333;
 const DIRETORIO_BASE = __dirname;
 const DIRETORIO_DADOS = path.join(DIRETORIO_BASE, "dados");
