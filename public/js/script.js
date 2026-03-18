@@ -101,8 +101,8 @@ function criarHorariosPadrao() {
 }
 
 function obterUrlBaseApi() {
-  const API_URL_PRODUCAO = "https://barbershop-api-4g5z.onrender.com";
-
+return "https://barbershop-api-4g5z.onrender.com";
+}
   // Rodando local (VS Code, Live Server, etc)
   if (
     window.location.hostname.includes("localhost") ||
