@@ -8,11 +8,17 @@ const ticketMedio = document.getElementById("ticket-medio");
 const clientesUnicos = document.getElementById("clientes-unicos");
 const taxaConclusao = document.getElementById("taxa-conclusao");
 const mensagemAdmin = document.getElementById("mensagem-admin");
-const mensagemBloqueioAdmin = document.getElementById("mensagem-bloqueio-admin");
-const listaAgendamentosAdmin = document.getElementById("lista-agendamentos-admin");
+const mensagemBloqueioAdmin = document.getElementById(
+  "mensagem-bloqueio-admin",
+);
+const listaAgendamentosAdmin = document.getElementById(
+  "lista-agendamentos-admin",
+);
 const listaConcluidosAdmin = document.getElementById("lista-concluidos-admin");
 const listaServicosAdmin = document.getElementById("lista-servicos-admin");
-const listaListaEsperaAdmin = document.getElementById("lista-lista-espera-admin");
+const listaListaEsperaAdmin = document.getElementById(
+  "lista-lista-espera-admin",
+);
 const lucroTotalMes = document.getElementById("lucro-total-mes");
 const clientesAtendidosMes = document.getElementById("clientes-atendidos-mes");
 const ticketMedioMes = document.getElementById("ticket-medio-mes");
@@ -23,7 +29,9 @@ const listaIndicadoresMes = document.getElementById("lista-indicadores-mes");
 const botaoResumoMensal = document.getElementById("botao-resumo-mensal");
 const dataBloqueioAdmin = document.getElementById("data-bloqueio-admin");
 const motivoBloqueioAdmin = document.getElementById("motivo-bloqueio-admin");
-const botaoBloquearDiaAdmin = document.getElementById("botao-bloquear-dia-admin");
+const botaoBloquearDiaAdmin = document.getElementById(
+  "botao-bloquear-dia-admin",
+);
 const botaoLiberarDiaAdmin = document.getElementById("botao-liberar-dia-admin");
 const botaoResetarDiaAdmin = document.getElementById("botao-resetar-dia-admin");
 const gradeBloqueioAdmin = document.getElementById("grade-bloqueio-admin");
@@ -31,15 +39,23 @@ const filtroDataAdmin = document.getElementById("filtro-data-admin");
 const filtroBuscaAdmin = document.getElementById("filtro-busca-admin");
 const botaoLimparFiltros = document.getElementById("botao-limpar-filtros");
 
-const alertaListaEsperaAdmin = document.getElementById("alerta-lista-espera-admin");
+const alertaListaEsperaAdmin = document.getElementById(
+  "alerta-lista-espera-admin",
+);
 const qtdListaEsperaAdmin = document.getElementById("qtd-lista-espera-admin");
-const secaoListaEsperaAdmin = document.querySelector(".secao-lista-espera-admin");
+const secaoListaEsperaAdmin = document.querySelector(
+  ".secao-lista-espera-admin",
+);
 
 const CHAVE_ACESSO_ADMIN = "barbershopAdminAutorizado";
 const SENHA_ADMIN = "admin";
 const URL_BASE_API = obterUrlBaseApi();
-const secoesColapsaveisAdmin = document.querySelectorAll("[data-admin-section]");
-const painelMensalColapsavel = document.getElementById("painel-mensal-colapsavel");
+const secoesColapsaveisAdmin = document.querySelectorAll(
+  "[data-admin-section]",
+);
+const painelMensalColapsavel = document.getElementById(
+  "painel-mensal-colapsavel",
+);
 
 let agendamentosCarregados = [];
 let agendamentosAtivosFiltrados = [];
@@ -69,15 +85,7 @@ function abrirSecaoAdmin(secao) {
 }
 
 function obterUrlBaseApi() {
-  if (window.location.protocol === "file:") {
-    return "http://127.0.0.1:3000";
-  }
-
-  if (window.location.port === "3000") {
-    return "";
-  }
-
-  return `${window.location.protocol}//${window.location.hostname}:3000`;
+  return "https://barbershop-api-4g5z.onrender.com";
 }
 
 function obterUrlApi(caminho) {
@@ -224,45 +232,54 @@ function extrairValorMonetario(preco) {
 function formatarMoeda(valor) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
-    currency: "BRL"
+    currency: "BRL",
   }).format(valor || 0);
 }
 
 function filtrarAgendamentosDoMes(agendamentos) {
   const mesSelecionado = filtroMesAdmin.value || obterMesAtual();
   return agendamentos.filter((item) =>
-    String(item.dataAgendamento || "").startsWith(`${mesSelecionado}-`)
+    String(item.dataAgendamento || "").startsWith(`${mesSelecionado}-`),
   );
 }
 
 function renderizarDashboardMensal(agendamentos) {
   const agendamentosDoMes = filtrarAgendamentosDoMes(agendamentos);
-  const concluidosDoMes = agendamentosDoMes.filter((item) => item.status === "concluido");
-  const canceladosDoMes = agendamentosDoMes.filter((item) => item.status === "cancelado");
-  const ativosDoMes = agendamentosDoMes.filter((item) => item.status === "ativo");
+  const concluidosDoMes = agendamentosDoMes.filter(
+    (item) => item.status === "concluido",
+  );
+  const canceladosDoMes = agendamentosDoMes.filter(
+    (item) => item.status === "cancelado",
+  );
+  const ativosDoMes = agendamentosDoMes.filter(
+    (item) => item.status === "ativo",
+  );
   const lucro = concluidosDoMes.reduce(
     (total, item) => total + extrairValorMonetario(item.preco),
-    0
+    0,
   );
   const clientes = new Set(
-    concluidosDoMes.map((item) =>
-      `${normalizarTexto(item.nomeCliente)}-${String(item.telefoneCliente || "").replace(/\D/g, "")}`
-    )
+    concluidosDoMes.map(
+      (item) =>
+        `${normalizarTexto(item.nomeCliente)}-${String(item.telefoneCliente || "").replace(/\D/g, "")}`,
+    ),
   );
   const ticket = concluidosDoMes.length ? lucro / concluidosDoMes.length : 0;
   const servicos = Array.from(
-    concluidosDoMes.reduce((mapa, agendamento) => {
-      const itemAtual = mapa.get(agendamento.servico) || {
-        nome: agendamento.servico,
-        total: 0,
-        valor: 0
-      };
+    concluidosDoMes
+      .reduce((mapa, agendamento) => {
+        const itemAtual = mapa.get(agendamento.servico) || {
+          nome: agendamento.servico,
+          total: 0,
+          valor: 0,
+        };
 
-      itemAtual.total += 1;
-      itemAtual.valor += extrairValorMonetario(agendamento.preco);
-      mapa.set(agendamento.servico, itemAtual);
-      return mapa;
-    }, new Map()).values()
+        itemAtual.total += 1;
+        itemAtual.valor += extrairValorMonetario(agendamento.preco);
+        mapa.set(agendamento.servico, itemAtual);
+        return mapa;
+      }, new Map())
+      .values(),
   ).sort((a, b) => {
     if (b.total === a.total) {
       return b.valor - a.valor;
@@ -296,7 +313,10 @@ function renderizarDashboardMensal(agendamentos) {
   }
 
   listaServicosMes.innerHTML = servicos.length
-    ? servicos.slice(0, 5).map((servico) => `
+    ? servicos
+        .slice(0, 5)
+        .map(
+          (servico) => `
         <article class="item-insight-servico">
           <div class="item-insight-servico-topo">
             <strong>${escaparHtml(servico.nome)}</strong>
@@ -307,7 +327,9 @@ function renderizarDashboardMensal(agendamentos) {
           </div>
           <p>${escaparHtml(formatarMoeda(servico.valor))} gerados no mes</p>
         </article>
-      `).join("")
+      `,
+        )
+        .join("")
     : `
       <article class="mensagem-vazia">
         <strong>Nenhum servico concluido no mes.</strong>
@@ -352,8 +374,8 @@ function renderizarDashboardMensal(agendamentos) {
 function criarMensagemWhatsapp(agendamento) {
   return encodeURIComponent(
     `Ola ${agendamento.nomeCliente}, seu horario na Barber shop Custom esta registrado para ${formatarData(
-      agendamento.dataAgendamento
-    )} as ${agendamento.horarioAgendamento}.`
+      agendamento.dataAgendamento,
+    )} as ${agendamento.horarioAgendamento}.`,
   );
 }
 
@@ -370,8 +392,8 @@ function obterUrlWhatsapp(agendamento) {
 function criarMensagemWhatsappListaEspera(item) {
   return encodeURIComponent(
     `Ola ${item.nomeCliente}, surgiu uma possibilidade de encaixe para ${item.servico} na data ${formatarData(
-      item.dataInteresse
-    )}. Se quiser, me responde para confirmar.`
+      item.dataInteresse,
+    )}. Se quiser, me responde para confirmar.`,
   );
 }
 
@@ -390,33 +412,40 @@ function atualizarResumo(agendamentos) {
   const ativos = agendamentos.filter((item) => item.status === "ativo");
   const ativosHoje = ativos.filter((item) => item.dataAgendamento === hoje);
   const concluidosHoje = agendamentos.filter(
-    (item) => item.status === "concluido" && item.dataAgendamento === hoje
+    (item) => item.status === "concluido" && item.dataAgendamento === hoje,
   );
-  const naoCancelados = agendamentos.filter((item) => item.status !== "cancelado");
+  const naoCancelados = agendamentos.filter(
+    (item) => item.status !== "cancelado",
+  );
   const faturamento = ativos.reduce(
     (total, item) => total + extrairValorMonetario(item.preco),
-    0
+    0,
   );
   const ticketMedioValor =
     naoCancelados.length > 0
-      ? naoCancelados.reduce((total, item) => total + extrairValorMonetario(item.preco), 0) /
-        naoCancelados.length
+      ? naoCancelados.reduce(
+          (total, item) => total + extrairValorMonetario(item.preco),
+          0,
+        ) / naoCancelados.length
       : 0;
   const clientes = new Set(
-    naoCancelados.map((item) =>
-      `${normalizarTexto(item.nomeCliente)}-${String(item.telefoneCliente || "").replace(/\D/g, "")}`
-    )
+    naoCancelados.map(
+      (item) =>
+        `${normalizarTexto(item.nomeCliente)}-${String(item.telefoneCliente || "").replace(/\D/g, "")}`,
+    ),
   );
   const baseTaxa = agendamentos.filter(
-    (item) => item.status === "ativo" || item.status === "concluido"
+    (item) => item.status === "ativo" || item.status === "concluido",
   ).length;
   const taxa = baseTaxa
     ? Math.round(
-        (agendamentos.filter((item) => item.status === "concluido").length / baseTaxa) * 100
+        (agendamentos.filter((item) => item.status === "concluido").length /
+          baseTaxa) *
+          100,
       )
     : 0;
   const proximo = ordenarAgendamentos(ativos).find(
-    (item) => item.dataAgendamento >= hoje
+    (item) => item.dataAgendamento >= hoje,
   );
 
   totalAgendamentos.textContent = agendamentos.length;
@@ -456,12 +485,12 @@ function renderizarAcoesAgendamento(agendamento) {
       ${
         urlWhatsapp
           ? `<a class="botao-secundario" href="${escaparHtml(
-              urlWhatsapp
+              urlWhatsapp,
             )}" target="_blank" rel="noreferrer">Chamar no WhatsApp</a>`
           : `<span class="acao-desabilitada">Telefone indisponivel</span>`
       }
       <button class="botao-secundario botao-concluir" type="button" data-id="${Number(
-        agendamento.id
+        agendamento.id,
       )}">
         Concluido
       </button>
@@ -497,11 +526,11 @@ function renderizarCartaoAgendamento(agendamento) {
         <div class="linha-agendamento">
           <span>Horario</span>
           <strong class="valor-destaque">${escaparHtml(
-            agendamento.horarioAgendamento
+            agendamento.horarioAgendamento,
           )}</strong>
         </div>
         <span class="etiqueta-status etiqueta-status-${normalizarTexto(
-          statusAgendamento
+          statusAgendamento,
         )}">${escaparHtml(statusAgendamento)}</span>
       </div>
 
@@ -539,7 +568,7 @@ function renderizarListaAgrupada(
   elementoLista,
   agendamentos,
   mensagemVazia,
-  renderizarCartao = renderizarCartaoAgendamento
+  renderizarCartao = renderizarCartaoAgendamento,
 ) {
   if (agendamentos.length === 0) {
     elementoLista.innerHTML = `
@@ -565,7 +594,7 @@ function renderizarListaAgrupada(
           <header class="cabecalho-grupo-agendamentos">
             <div>
               <p class="etiqueta-grupo-agendamentos">${escaparHtml(
-                formatarDiaSemana(dataAgendamento)
+                formatarDiaSemana(dataAgendamento),
               )}</p>
               <h3>${escaparHtml(formatarData(dataAgendamento))}</h3>
             </div>
@@ -589,7 +618,7 @@ function renderizarInsightsServicos(agendamentos) {
         const itemAtual = mapa.get(agendamento.servico) || {
           nome: agendamento.servico,
           total: 0,
-          faturamento: 0
+          faturamento: 0,
         };
 
         itemAtual.total += 1;
@@ -597,7 +626,7 @@ function renderizarInsightsServicos(agendamentos) {
         mapa.set(agendamento.servico, itemAtual);
         return mapa;
       }, new Map())
-      .values()
+      .values(),
   ).sort((a, b) => {
     if (b.total === a.total) {
       return b.faturamento - a.faturamento;
@@ -618,7 +647,10 @@ function renderizarInsightsServicos(agendamentos) {
 
   const maiorVolume = servicos[0].total || 1;
 
-  listaServicosAdmin.innerHTML = servicos.slice(0, 5).map((servico) => `
+  listaServicosAdmin.innerHTML = servicos
+    .slice(0, 5)
+    .map(
+      (servico) => `
     <article class="item-insight-servico">
       <div class="item-insight-servico-topo">
         <strong>${escaparHtml(servico.nome)}</strong>
@@ -629,7 +661,9 @@ function renderizarInsightsServicos(agendamentos) {
       </div>
       <p>${escaparHtml(formatarMoeda(servico.faturamento))} em valor acumulado</p>
     </article>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 function formatarStatusListaEspera(status) {
@@ -645,7 +679,9 @@ function formatarStatusListaEspera(status) {
 }
 
 function renderizarListaEsperaAdmin(listaEspera) {
-  const pendentes = listaEspera.filter((item) => item.status === "pendente").length;
+  const pendentes = listaEspera.filter(
+    (item) => item.status === "pendente",
+  ).length;
 
   if (pendentes > 0 && alertaListaEsperaAdmin && qtdListaEsperaAdmin) {
     qtdListaEsperaAdmin.textContent = pendentes;
@@ -664,12 +700,15 @@ function renderizarListaEsperaAdmin(listaEspera) {
     return;
   }
 
-  listaListaEsperaAdmin.innerHTML = listaEspera.map((item) => {
-    const urlWhatsapp = obterUrlWhatsappListaEspera(item);
-    const proximoStatus = item.status === "pendente" ? "contatado" : "encerrado";
-    const textoBotao = item.status === "pendente" ? "Marcar contato" : "Encerrar";
+  listaListaEsperaAdmin.innerHTML = listaEspera
+    .map((item) => {
+      const urlWhatsapp = obterUrlWhatsappListaEspera(item);
+      const proximoStatus =
+        item.status === "pendente" ? "contatado" : "encerrado";
+      const textoBotao =
+        item.status === "pendente" ? "Marcar contato" : "Encerrar";
 
-    return `
+      return `
       <article class="item-lista-espera-admin">
         <div class="item-lista-espera-admin-topo">
           <strong>${escaparHtml(item.nomeCliente)}</strong>
@@ -692,7 +731,8 @@ function renderizarListaEsperaAdmin(listaEspera) {
         </div>
       </article>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 function renderizarPainelBloqueioAdmin() {
@@ -717,30 +757,36 @@ function renderizarPainelBloqueioAdmin() {
   }
 
   const bloqueiosPorHorario = new Map(
-    bloqueiosDataAdmin.map((item) => [item.horarioAgendamento, item])
+    bloqueiosDataAdmin.map((item) => [item.horarioAgendamento, item]),
   );
 
-  gradeBloqueioAdmin.innerHTML = horariosDataAdmin.horariosPadrao.map((horario) => {
-    const bloqueio = bloqueiosPorHorario.get(horario);
-    const horarioOcupado = (horariosDataAdmin.horariosOcupados || []).includes(horario);
-    const horarioPassado = (horariosDataAdmin.horariosPassados || []).includes(horario);
-    const horarioBloqueado = Boolean(bloqueio);
-    const acao = horarioBloqueado ? "liberar" : "bloquear";
-    const textoAcao = horarioBloqueado ? "Liberar" : "Bloquear";
-    const classeEstado = horarioOcupado || horarioPassado
-      ? "botao-bloqueio-admin-ocupado"
-      : horarioBloqueado
-        ? "botao-bloqueio-admin-bloqueado"
-        : "botao-bloqueio-admin-livre";
-    const descricao = horarioPassado
-      ? "Horario ja passou"
-      : horarioOcupado
-      ? "Ja ocupado"
-      : horarioBloqueado
-        ? bloqueio.motivo || "Bloqueado manualmente"
-        : "Disponivel";
+  gradeBloqueioAdmin.innerHTML = horariosDataAdmin.horariosPadrao
+    .map((horario) => {
+      const bloqueio = bloqueiosPorHorario.get(horario);
+      const horarioOcupado = (
+        horariosDataAdmin.horariosOcupados || []
+      ).includes(horario);
+      const horarioPassado = (
+        horariosDataAdmin.horariosPassados || []
+      ).includes(horario);
+      const horarioBloqueado = Boolean(bloqueio);
+      const acao = horarioBloqueado ? "liberar" : "bloquear";
+      const textoAcao = horarioBloqueado ? "Liberar" : "Bloquear";
+      const classeEstado =
+        horarioOcupado || horarioPassado
+          ? "botao-bloqueio-admin-ocupado"
+          : horarioBloqueado
+            ? "botao-bloqueio-admin-bloqueado"
+            : "botao-bloqueio-admin-livre";
+      const descricao = horarioPassado
+        ? "Horario ja passou"
+        : horarioOcupado
+          ? "Ja ocupado"
+          : horarioBloqueado
+            ? bloqueio.motivo || "Bloqueado manualmente"
+            : "Disponivel";
 
-    return `
+      return `
       <button
         type="button"
         class="botao-bloqueio-admin ${classeEstado}"
@@ -753,7 +799,8 @@ function renderizarPainelBloqueioAdmin() {
         <small>${escaparHtml(horarioPassado ? "Passou" : horarioOcupado ? "Ocupado" : textoAcao)}</small>
       </button>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 function atualizarMensagemFiltros() {
@@ -761,7 +808,7 @@ function atualizarMensagemFiltros() {
   const ativos = agendamentosAtivosFiltrados.length;
   const concluidos = concluidosHojeFiltrados.length;
   const existeFiltroAtivo =
-    (filtroDataAdmin?.value || "") || (filtroBuscaAdmin?.value || "").trim();
+    filtroDataAdmin?.value || "" || (filtroBuscaAdmin?.value || "").trim();
 
   if (!total) {
     mensagemAdmin.textContent = "Nenhum agendamento salvo ate o momento.";
@@ -793,8 +840,8 @@ function correspondeBusca(agendamento, buscaFiltro) {
       agendamento.preco,
       formatarData(agendamento.dataAgendamento),
       agendamento.horarioAgendamento,
-      agendamento.status
-    ].join(" ")
+      agendamento.status,
+    ].join(" "),
   );
 
   return conteudoBusca.includes(buscaFiltro);
@@ -807,13 +854,14 @@ function aplicarFiltros() {
 
   agendamentosAtivosFiltrados = ordenarAgendamentos(
     agendamentosCarregados.filter((agendamento) => {
-      const correspondeData = !dataFiltro || agendamento.dataAgendamento === dataFiltro;
+      const correspondeData =
+        !dataFiltro || agendamento.dataAgendamento === dataFiltro;
       return (
         agendamento.status === "ativo" &&
         correspondeData &&
         correspondeBusca(agendamento, buscaFiltro)
       );
-    })
+    }),
   );
 
   concluidosHojeFiltrados = ordenarAgendamentos(
@@ -827,7 +875,7 @@ function aplicarFiltros() {
         correspondeData &&
         correspondeBusca(agendamento, buscaFiltro)
       );
-    })
+    }),
   );
 
   renderizarListaAgrupada(
@@ -835,14 +883,16 @@ function aplicarFiltros() {
     agendamentosAtivosFiltrados,
     {
       titulo: "Nenhum agendamento ativo encontrado.",
-      texto: "Quando surgir um novo horario confirmado, ele aparece aqui pronto para o atendimento."
+      texto:
+        "Quando surgir um novo horario confirmado, ele aparece aqui pronto para o atendimento.",
     },
-    renderizarCartaoAgendamentoAtivo
+    renderizarCartaoAgendamentoAtivo,
   );
 
   renderizarListaAgrupada(listaConcluidosAdmin, concluidosHojeFiltrados, {
     titulo: "Nenhum atendimento concluido hoje.",
-    texto: "Assim que o barbeiro marcar um atendimento como concluido, ele aparece aqui."
+    texto:
+      "Assim que o barbeiro marcar um atendimento como concluido, ele aparece aqui.",
   });
 
   atualizarMensagemFiltros();
@@ -869,7 +919,7 @@ function converterParaCsv(agendamentos) {
     "Preco",
     "Data",
     "Horario",
-    "Status"
+    "Status",
   ];
 
   const linhas = agendamentos.map((agendamento) => [
@@ -880,14 +930,14 @@ function converterParaCsv(agendamentos) {
     agendamento.preco,
     formatarData(agendamento.dataAgendamento),
     agendamento.horarioAgendamento,
-    agendamento.status
+    agendamento.status,
   ]);
 
   return [cabecalho, ...linhas]
     .map((colunas) =>
       colunas
         .map((coluna) => `"${String(coluna).replaceAll('"', '""')}"`)
-        .join(";")
+        .join(";"),
     )
     .join("\n");
 }
@@ -895,7 +945,7 @@ function converterParaCsv(agendamentos) {
 function exportarCsv() {
   const listaParaExportar = [
     ...agendamentosAtivosFiltrados,
-    ...concluidosHojeFiltrados
+    ...concluidosHojeFiltrados,
   ];
 
   if (!listaParaExportar.length) {
@@ -929,28 +979,44 @@ async function carregarPainelBloqueioAdmin() {
 
   try {
     const [respostaHorarios, respostaBloqueios] = await Promise.all([
-      fetch(obterUrlApi(`/api/horarios?data=${encodeURIComponent(dataSelecionada)}`)),
-      fetch(obterUrlApi(`/api/bloqueios?data=${encodeURIComponent(dataSelecionada)}`))
+      fetch(
+        obterUrlApi(
+          `/api/horarios?data=${encodeURIComponent(dataSelecionada)}`,
+        ),
+      ),
+      fetch(
+        obterUrlApi(
+          `/api/bloqueios?data=${encodeURIComponent(dataSelecionada)}`,
+        ),
+      ),
     ]);
-    const tipoConteudoHorarios = respostaHorarios.headers.get("content-type") || "";
-    const tipoConteudoBloqueios = respostaBloqueios.headers.get("content-type") || "";
+    const tipoConteudoHorarios =
+      respostaHorarios.headers.get("content-type") || "";
+    const tipoConteudoBloqueios =
+      respostaBloqueios.headers.get("content-type") || "";
 
     if (
       !tipoConteudoHorarios.includes("application/json") ||
       !tipoConteudoBloqueios.includes("application/json")
     ) {
-      throw new Error("A API nao respondeu JSON ao carregar o painel de bloqueio.");
+      throw new Error(
+        "A API nao respondeu JSON ao carregar o painel de bloqueio.",
+      );
     }
 
     const dadosHorarios = await respostaHorarios.json();
     const dadosBloqueios = await respostaBloqueios.json();
 
     if (!respostaHorarios.ok) {
-      throw new Error(dadosHorarios.erro || "Nao foi possivel carregar os horarios do dia.");
+      throw new Error(
+        dadosHorarios.erro || "Nao foi possivel carregar os horarios do dia.",
+      );
     }
 
     if (!respostaBloqueios.ok) {
-      throw new Error(dadosBloqueios.erro || "Nao foi possivel carregar os bloqueios do dia.");
+      throw new Error(
+        dadosBloqueios.erro || "Nao foi possivel carregar os bloqueios do dia.",
+      );
     }
 
     horariosDataAdmin = dadosHorarios;
@@ -965,7 +1031,10 @@ async function atualizarBloqueioHorarioAdmin(acao, horarioAgendamento) {
   const dataAgendamento = dataBloqueioAdmin.value;
 
   if (!dataAgendamento) {
-    mostrarMensagemBloqueioAdmin("Escolha uma data antes de bloquear horarios.", "erro");
+    mostrarMensagemBloqueioAdmin(
+      "Escolha uma data antes de bloquear horarios.",
+      "erro",
+    );
     return;
   }
 
@@ -976,13 +1045,13 @@ async function atualizarBloqueioHorarioAdmin(acao, horarioAgendamento) {
     const resposta = await fetch(obterUrlApi(rota), {
       method: metodo,
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         dataAgendamento,
         horarioAgendamento,
-        motivo: motivoBloqueioAdmin.value.trim()
-      })
+        motivo: motivoBloqueioAdmin.value.trim(),
+      }),
     });
     const tipoConteudo = resposta.headers.get("content-type") || "";
 
@@ -1008,7 +1077,10 @@ async function bloquearDiaInteiroAdmin() {
   const dataAgendamento = dataBloqueioAdmin.value;
 
   if (!dataAgendamento) {
-    mostrarMensagemBloqueioAdmin("Escolha uma data antes de bloquear o dia.", "erro");
+    mostrarMensagemBloqueioAdmin(
+      "Escolha uma data antes de bloquear o dia.",
+      "erro",
+    );
     return;
   }
 
@@ -1016,12 +1088,12 @@ async function bloquearDiaInteiroAdmin() {
     const resposta = await fetch(obterUrlApi("/api/bloqueios-dia"), {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         dataAgendamento,
-        motivo: motivoBloqueioAdmin.value.trim()
-      })
+        motivo: motivoBloqueioAdmin.value.trim(),
+      }),
     });
     const tipoConteudo = resposta.headers.get("content-type") || "";
 
@@ -1047,7 +1119,10 @@ async function liberarBloqueiosDiaAdmin() {
   const dataAgendamento = dataBloqueioAdmin.value;
 
   if (!dataAgendamento) {
-    mostrarMensagemBloqueioAdmin("Escolha uma data antes de liberar bloqueios.", "erro");
+    mostrarMensagemBloqueioAdmin(
+      "Escolha uma data antes de liberar bloqueios.",
+      "erro",
+    );
     return;
   }
 
@@ -1055,9 +1130,9 @@ async function liberarBloqueiosDiaAdmin() {
     const resposta = await fetch(obterUrlApi("/api/bloqueios-dia"), {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ dataAgendamento })
+      body: JSON.stringify({ dataAgendamento }),
     });
     const tipoConteudo = resposta.headers.get("content-type") || "";
 
@@ -1068,7 +1143,9 @@ async function liberarBloqueiosDiaAdmin() {
     const dados = await resposta.json();
 
     if (!resposta.ok) {
-      throw new Error(dados.erro || "Nao foi possivel liberar os bloqueios do dia.");
+      throw new Error(
+        dados.erro || "Nao foi possivel liberar os bloqueios do dia.",
+      );
     }
 
     mostrarMensagemBloqueioAdmin(dados.mensagem, "sucesso");
@@ -1083,11 +1160,18 @@ async function resetarAgendamentosDiaAdmin() {
   const dataAgendamento = dataBloqueioAdmin.value;
 
   if (!dataAgendamento) {
-    mostrarMensagemBloqueioAdmin("Escolha uma data antes de resetar o dia.", "erro");
+    mostrarMensagemBloqueioAdmin(
+      "Escolha uma data antes de resetar o dia.",
+      "erro",
+    );
     return;
   }
 
-  if (!window.confirm(`Tem certeza que deseja cancelar TODOS os agendamentos ativos do dia ${formatarData(dataAgendamento)}?`)) {
+  if (
+    !window.confirm(
+      `Tem certeza que deseja cancelar TODOS os agendamentos ativos do dia ${formatarData(dataAgendamento)}?`,
+    )
+  ) {
     return;
   }
 
@@ -1095,9 +1179,9 @@ async function resetarAgendamentosDiaAdmin() {
     const resposta = await fetch(obterUrlApi("/api/resetar-dia"), {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ dataAgendamento })
+      body: JSON.stringify({ dataAgendamento }),
     });
     const tipoConteudo = resposta.headers.get("content-type") || "";
 
@@ -1108,7 +1192,9 @@ async function resetarAgendamentosDiaAdmin() {
     const dados = await resposta.json();
 
     if (!resposta.ok) {
-      throw new Error(dados.erro || "Nao foi possivel resetar os agendamentos do dia.");
+      throw new Error(
+        dados.erro || "Nao foi possivel resetar os agendamentos do dia.",
+      );
     }
 
     mostrarMensagemBloqueioAdmin(dados.mensagem, "sucesso");
@@ -1121,23 +1207,30 @@ async function resetarAgendamentosDiaAdmin() {
 
 async function atualizarStatusListaEsperaAdmin(idListaEspera, status) {
   try {
-    const resposta = await fetch(obterUrlApi(`/api/lista-espera/${idListaEspera}`), {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json"
+    const resposta = await fetch(
+      obterUrlApi(`/api/lista-espera/${idListaEspera}`),
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
       },
-      body: JSON.stringify({ status })
-    });
+    );
     const tipoConteudo = resposta.headers.get("content-type") || "";
 
     if (!tipoConteudo.includes("application/json")) {
-      throw new Error("A API nao respondeu JSON ao atualizar a lista de espera.");
+      throw new Error(
+        "A API nao respondeu JSON ao atualizar a lista de espera.",
+      );
     }
 
     const dados = await resposta.json();
 
     if (!resposta.ok) {
-      throw new Error(dados.erro || "Nao foi possivel atualizar a lista de espera.");
+      throw new Error(
+        dados.erro || "Nao foi possivel atualizar a lista de espera.",
+      );
     }
 
     mensagemAdmin.textContent = dados.mensagem;
@@ -1153,7 +1246,7 @@ async function marcarAgendamentoConcluido(idAgendamento) {
   try {
     const resposta = await fetch(
       obterUrlApi(`/api/agendamentos/${idAgendamento}/concluir`),
-      { method: "PATCH" }
+      { method: "PATCH" },
     );
     const tipoConteudo = resposta.headers.get("content-type") || "";
 
@@ -1183,7 +1276,7 @@ async function carregarAgendamentos() {
   try {
     const [respostaAgendamentos, respostaListaEspera] = await Promise.all([
       fetch(obterUrlApi("/api/agendamentos")),
-      fetch(obterUrlApi("/api/lista-espera"))
+      fetch(obterUrlApi("/api/lista-espera")),
     ]);
     const tipoConteudoAgendamentos =
       respostaAgendamentos.headers.get("content-type") || "";
@@ -1195,7 +1288,7 @@ async function carregarAgendamentos() {
       !tipoConteudoListaEspera.includes("application/json")
     ) {
       throw new Error(
-        "A API nao respondeu JSON. Verifique se o servidor Node esta rodando."
+        "A API nao respondeu JSON. Verifique se o servidor Node esta rodando.",
       );
     }
 
@@ -1204,13 +1297,13 @@ async function carregarAgendamentos() {
 
     if (!respostaAgendamentos.ok) {
       throw new Error(
-        dadosAgendamentos.erro || "Nao foi possivel carregar os agendamentos."
+        dadosAgendamentos.erro || "Nao foi possivel carregar os agendamentos.",
       );
     }
 
     if (!respostaListaEspera.ok) {
       throw new Error(
-        dadosListaEspera.erro || "Nao foi possivel carregar a lista de espera."
+        dadosListaEspera.erro || "Nao foi possivel carregar a lista de espera.",
       );
     }
 
@@ -1261,7 +1354,7 @@ if (botaoResumoMensal) {
     abrirSecaoAdmin(painelMensalColapsavel);
     painelMensalColapsavel.scrollIntoView({
       behavior: "smooth",
-      block: "start"
+      block: "start",
     });
   });
 }
@@ -1271,7 +1364,7 @@ if (alertaListaEsperaAdmin) {
     abrirSecaoAdmin(secaoListaEsperaAdmin);
     secaoListaEsperaAdmin.scrollIntoView({
       behavior: "smooth",
-      block: "start"
+      block: "start",
     });
   });
 }
@@ -1308,7 +1401,7 @@ listaListaEsperaAdmin.addEventListener("click", async (evento) => {
 
   await atualizarStatusListaEsperaAdmin(
     Number(botaoAtualizar.dataset.id),
-    botaoAtualizar.dataset.status
+    botaoAtualizar.dataset.status,
   );
 });
 
@@ -1324,7 +1417,7 @@ gradeBloqueioAdmin.addEventListener("click", async (evento) => {
 
   await atualizarBloqueioHorarioAdmin(
     botaoBloqueio.dataset.acao,
-    botaoBloqueio.dataset.horario
+    botaoBloqueio.dataset.horario,
   );
 });
 
