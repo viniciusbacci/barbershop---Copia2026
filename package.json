@@ -1,0 +1,20 @@
+{
+  "name": "barbershop-custom",
+  "version": "1.0.0",
+  "description": "Sistema simples de agendamento para barbearia com Node e SQLite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --no-warnings=ExperimentalWarning server.js",
+    "dev": "node --watch --no-warnings=ExperimentalWarning server.js",
+    "build": "cleancss -o public/css/style.min.css public/css/style.css && terser public/js/script.js -o public/js/script.min.js -c -m && terser public/js/admin.js -o public/js/admin.min.js -c -m"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "sqlite3": "^6.0.1"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "terser": "^5.46.1"
+  }
+}

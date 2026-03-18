@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin | Barber shop Custom</title>
+    <meta name="description" content="Painel simples para visualizar os horarios agendados da Barber shop Custom.">
+    <link rel="stylesheet" href="css/style.min.css">
+</head>
+
+<body>
+    <main class="pagina pagina-admin">
+        <section class="app-agendamento app-admin">
+            <div class="layout-topo-admin">
+                <header class="cabecalho-destaque cabecalho-admin">
+                    <div class="topo">
+                        <span class="selo-topo">Painel do administrador</span>
+                        <a class="botao-entrar" href="index.html">Voltar ao site</a>
+                    </div>
+
+                    <div class="conteudo-admin">
+                        <div class="texto-destaque">
+                            <p class="sobretitulo">Controle simples</p>
+                            <h1>Agendamentos salvos</h1>
+                            <p class="descricao-destaque">
+                                Esta tela consulta o banco de dados local e mostra todos os horarios confirmados.
+                            </p>
+                        </div>
+
+                        <button id="botao-atualizar-admin" class="botao-principal botao-principal-menor" type="button">
+                            Atualizar lista
+                        </button>
+                    </div>
+                </header>
+
+            </div>
+
+            <div class="layout-conteudo-admin">
+                <!-- 2. Agendamentos Ativos -->
+                <details class="cartao painel-colapsavel-admin secao-lista-admin" data-admin-section open>
+                    <summary class="resumo-colapsavel-admin">
+                        <div>
+                            <p class="passo-secao">Lista</p>
+                            <h2 id="titulo-lista-admin">Agendamentos ativos</h2>
+                            <p>Agenda principal do dia a dia, aberta e pronta para o atendimento.</p>
+                        </div>
+                        <span class="indicador-colapsavel-admin" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="conteudo-colapsavel-admin bloco-secao">
+                        <p id="mensagem-admin" class="mensagem-status informacao">Carregando dados do servidor...</p>
+                        <div id="lista-agendamentos-admin" class="lista-admin"></div>
+                    </div>
+                </details>
+
+                <!-- 3. Travar Agenda -->
+                <details class="cartao painel-colapsavel-admin secao-bloqueio-admin" data-admin-section>
+                    <summary class="resumo-colapsavel-admin">
+                        <div>
+                            <p class="passo-secao">Bloqueio manual</p>
+                            <h2 id="titulo-bloqueio-admin">Travar agenda com facilidade</h2>
+                            <p>Abra para bloquear ou liberar horarios sem se perder.</p>
+                        </div>
+                        <span class="indicador-colapsavel-admin" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="conteudo-colapsavel-admin bloco-secao">
+                        <div class="filtros-bloqueio-admin">
+                            <label class="grupo-campo" for="data-bloqueio-admin">
+                                <span>Data do bloqueio</span>
+                                <input type="date" id="data-bloqueio-admin" name="data-bloqueio-admin">
+                            </label>
+
+                            <label class="grupo-campo" for="motivo-bloqueio-admin">
+                                <span>Motivo opcional</span>
+                                <input type="text" id="motivo-bloqueio-admin" name="motivo-bloqueio-admin"
+                                    placeholder="Ex.: viagem, problema de saude, compromisso">
+                            </label>
+                        </div>
+
+                        <div class="acoes-admin">
+                            <button id="botao-bloquear-dia-admin" class="botao-secundario" type="button">
+                                Bloquear dia inteiro
+                            </button>
+
+                            <button id="botao-liberar-dia-admin" class="botao-secundario" type="button">
+                                Liberar bloqueios do dia
+                            </button>
+
+                            <button id="botao-resetar-dia-admin" class="botao-secundario" type="button" style="color: #ef4444; border-color: #ef4444;">
+                                Resetar agendamentos do dia
+                            </button>
+                        </div>
+
+                        <p id="mensagem-bloqueio-admin" class="mensagem-status oculto" aria-live="polite"></p>
+                        <div id="grade-bloqueio-admin" class="grade-bloqueio-admin"></div>
+                    </div>
+                </details>
+
+                <!-- 4. Alerta de Clientes Aguardando -->
+                <div id="alerta-lista-espera-admin" class="mensagem-status alerta oculto" style="cursor: pointer;" role="button" tabindex="0">
+                    <strong>⚠️ Alerta:</strong> Existem <span id="qtd-lista-espera-admin">0</span> clientes aguardando na lista de espera. Clique para visualizar.
+                </div>
+
+                <!-- 5. Pedidos de Encaixe -->
+                <details class="cartao painel-colapsavel-admin secao-lista-espera-admin" data-admin-section>
+                    <summary class="resumo-colapsavel-admin">
+                        <div>
+                            <p class="passo-secao">Lista de espera</p>
+                            <h2 id="titulo-lista-espera-admin">Pedidos de encaixe</h2>
+                            <p>Abra para acompanhar pedidos e chamar no WhatsApp.</p>
+                        </div>
+                        <span class="indicador-colapsavel-admin" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="conteudo-colapsavel-admin bloco-secao">
+                        <div id="lista-lista-espera-admin" class="lista-admin"></div>
+                    </div>
+                </details>
+
+                <!-- 6. Concluidos do Dia -->
+                <details class="cartao painel-colapsavel-admin secao-concluidos-admin" data-admin-section>
+                    <summary class="resumo-colapsavel-admin">
+                        <div>
+                            <p class="passo-secao">Concluidos</p>
+                            <h2 id="titulo-concluidos-admin">Concluidos do dia</h2>
+                            <p>Abra para consultar o que ja saiu da lista principal.</p>
+                        </div>
+                        <span class="indicador-colapsavel-admin" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="conteudo-colapsavel-admin bloco-secao">
+                        <div id="lista-concluidos-admin" class="lista-admin"></div>
+                    </div>
+                </details>
+
+                <!-- 7. Dashboard do Mes -->
+                <details class="cartao painel-colapsavel-admin" id="painel-mensal-colapsavel" data-admin-section>
+                    <summary class="resumo-colapsavel-admin">
+                        <div>
+                            <p class="passo-secao">Resumo mensal</p>
+                            <h2 id="titulo-painel-mensal">Dashboard do mes</h2>
+                            <p>Abra para ver lucro, clientes e servicos mais fortes do periodo.</p>
+                        </div>
+                        <span class="indicador-colapsavel-admin" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="conteudo-colapsavel-admin bloco-secao">
+                        <section class="painel-mensal-admin" aria-labelledby="titulo-painel-mensal">
+                            <div class="cabecalho-secao cabecalho-painel-mensal">
+                                <div>
+                                    <p class="passo-secao">Resumo mensal</p>
+                                    <h2>Dashboard do mes</h2>
+                                    <p>Veja faturamento real, clientes atendidos e os servicos que mais performaram no periodo.</p>
+                                </div>
+
+                                <label class="grupo-campo grupo-campo-mes-admin" for="filtro-mes-admin">
+                                    <span>Selecionar mes</span>
+                                    <input type="month" id="filtro-mes-admin" name="filtro-mes-admin">
+                                </label>
+                            </div>
+
+                            <div class="grade-painel-mensal">
+                                <article class="cartao-resumo-admin cartao-resumo-mensal">
+                                    <span>Lucro total do mes</span>
+                                    <small class="detalhe-resumo-admin">Resultado acumulado no periodo:</small>
+                                    <strong id="lucro-total-mes" class="valor-resumo-admin">R$0,00</strong>
+                                </article>
+
+                                <article class="cartao-resumo-admin cartao-resumo-mensal">
+                                    <span>Clientes atendidos</span>
+                                    <small class="detalhe-resumo-admin">Quantidade atendida no mes:</small>
+                                    <strong id="clientes-atendidos-mes" class="valor-resumo-admin">0</strong>
+                                </article>
+
+                                <article class="cartao-resumo-admin cartao-resumo-mensal">
+                                    <span>Ticket medio do mes</span>
+                                    <small class="detalhe-resumo-admin">Media por servico concluido:</small>
+                                    <strong id="ticket-medio-mes" class="valor-resumo-admin">R$0,00</strong>
+                                </article>
+
+                                <article class="cartao-resumo-admin cartao-resumo-mensal">
+                                    <span>Servico campeao</span>
+                                    <strong id="servico-campeao-mes" class="valor-resumo-admin">Nenhum</strong>
+                                </article>
+                            </div>
+
+                            <div class="layout-insights-mensais">
+                                <section class="cartao bloco-secao cartao-interno-mensal" aria-labelledby="titulo-servicos-mes">
+                                    <div class="cabecalho-secao">
+                                        <p class="passo-secao">Servicos</p>
+                                        <h3 id="titulo-servicos-mes">Mais feitos no mes</h3>
+                                        <p>Ranking com quantidade e valor gerado por servico concluido.</p>
+                                    </div>
+
+                                    <div id="lista-servicos-mes" class="lista-admin"></div>
+                                </section>
+
+                                <section class="cartao bloco-secao cartao-interno-mensal" aria-labelledby="titulo-status-mes">
+                                    <div class="cabecalho-secao">
+                                        <p class="passo-secao">Indicadores</p>
+                                        <h3 id="titulo-status-mes">Leitura do periodo</h3>
+                                        <p>Comparativo rapido entre concluidos, cancelados e agenda prevista do mes.</p>
+                                    </div>
+
+                                    <div id="lista-indicadores-mes" class="lista-admin"></div>
+                                </section>
+                            </div>
+                        </section>
+                    </div>
+                </details>
+
+                <!-- 8. Visao Geral (Resumo) -->
+                <details class="cartao painel-colapsavel-admin painel-resumo-admin" data-admin-section>
+                    <summary class="resumo-colapsavel-admin">
+                        <div>
+                            <p class="passo-secao">Resumo</p>
+                            <h2 id="titulo-resumo-admin">Visao geral</h2>
+                            <p>Toque para abrir os numeros principais da agenda.</p>
+                        </div>
+                        <span class="indicador-colapsavel-admin" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="conteudo-colapsavel-admin bloco-secao">
+                        <div class="grade-resumo-admin">
+                            <article class="cartao-resumo-admin">
+                                <span>Total de agendamentos</span>
+                                <strong id="total-agendamentos" class="valor-resumo-admin">0</strong>
+                            </article>
+
+                            <article class="cartao-resumo-admin">
+                                <span>Agendamentos de hoje</span>
+                                <strong id="total-hoje" class="valor-resumo-admin">0</strong>
+                            </article>
+
+                            <article class="cartao-resumo-admin">
+                                <span>Proximo horario</span>
+                                <strong id="proximo-horario" class="valor-resumo-admin valor-proximo-horario">Nenhum</strong>
+                            </article>
+
+                            <article class="cartao-resumo-admin">
+                                <span>Concluidos hoje</span>
+                                <strong id="total-concluidos-hoje" class="valor-resumo-admin">0</strong>
+                            </article>
+
+                            <article class="cartao-resumo-admin">
+                                <span>Faturamento previsto</span>
+                                <small class="detalhe-resumo-admin">Hoje voce tem previsto:</small>
+                                <strong id="faturamento-previsto" class="valor-resumo-admin">R$0,00</strong>
+                            </article>
+
+                            <article class="cartao-resumo-admin">
+                                <span>Ticket medio</span>
+                                <small class="detalhe-resumo-admin">Valor medio por atendimento:</small>
+                                <strong id="ticket-medio" class="valor-resumo-admin">R$0,00</strong>
+                            </article>
+
+                            <article class="cartao-resumo-admin">
+                                <span>Clientes unicos</span>
+                                <small class="detalhe-resumo-admin">Clientes atendidos:</small>
+                                <strong id="clientes-unicos" class="valor-resumo-admin">0</strong>
+                            </article>
+
+                            <article class="cartao-resumo-admin">
+                                <span>Taxa de conclusao</span>
+                                <strong id="taxa-conclusao" class="valor-resumo-admin">0%</strong>
+                            </article>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 9. Servicos Mais Fortes -->
+                <details class="cartao painel-colapsavel-admin painel-servicos-admin" data-admin-section>
+                    <summary class="resumo-colapsavel-admin">
+                        <div>
+                            <p class="passo-secao">Servicos</p>
+                            <h2 id="titulo-servicos-admin">Servicos mais fortes</h2>
+                            <p>Abra para ver o que mais traz demanda e valor.</p>
+                        </div>
+                        <span class="indicador-colapsavel-admin" aria-hidden="true"></span>
+                    </summary>
+
+                    <div class="conteudo-colapsavel-admin bloco-secao">
+                        <div id="lista-servicos-admin" class="lista-admin"></div>
+                    </div>
+                </details>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/admin.min.js"></script>
+</body>
+
+</html>

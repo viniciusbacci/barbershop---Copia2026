@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barber shop Custom | Agendamento</title>
+    <meta name="description"
+        content="Agende seu hor&aacute;rio na Barber shop Custom de forma r&aacute;pida e pr&aacute;tica.">
+    <link rel="stylesheet" href="css/style.min.css">
+</head>
+
+<body>
+    <main class="pagina pagina-index">
+        <section class="app-agendamento">
+            <div class="layout-topo-index">
+                <div class="coluna-apresentacao-index">
+                    <header class="cabecalho-destaque">
+
+                        <div class="topo">
+                            <a class="selo-topo selo-topo-link" href="sistema.html">Como funciona o sistema</a>
+                            <button id="botao-toggle-area-cliente"
+                                class="botao-secundario botao-toggle-area-cliente oculto" type="button">
+                                cancelar agendamento
+                            </button>
+                            <button id="botao-painel-admin" class="botao-entrar" type="button">Painel admin</button>
+                        </div>
+
+                        <div class="conteudo-destaque">
+                            <div class="caixa-logo">
+                                <img src="img/logo.png" alt="Logo da Barber shop Custom" class="logo-principal">
+                            </div>
+
+                            <div class="texto-destaque">
+                                <p class="sobretitulo">Barbearia tradicional com agenda pronta para vender</p>
+                                <h1>Barber shop Custom</h1>
+
+                            </div>
+                        </div>
+
+                        <nav class="lista-contatos" aria-label="Canais de contato da barbearia">
+                            <a class="item-contato" href="https://wa.me/5519994926670" target="_blank" rel="noreferrer"
+                                aria-label="WhatsApp">
+                                <span class="icone-contato" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" role="img">
+                                        <path
+                                            d="M19.05 4.94A9.9 9.9 0 0 0 12 2a10 10 0 0 0-8.7 14.94L2 22l5.22-1.36A10 10 0 1 0 19.05 4.94Zm-7.05 15.2a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.1.81.83-3.02-.2-.31A8.23 8.23 0 1 1 12 20.14Zm4.52-6.2c-.25-.12-1.46-.72-1.68-.8-.23-.08-.39-.12-.56.12-.16.25-.64.8-.78.96-.14.16-.28.18-.53.06-.24-.12-1.01-.37-1.92-1.18-.71-.63-1.2-1.41-1.33-1.65-.14-.25-.02-.38.1-.5.1-.1.24-.27.35-.41.12-.14.16-.24.25-.4.08-.16.04-.3-.02-.42-.06-.12-.56-1.34-.77-1.84-.2-.48-.4-.42-.56-.42h-.48c-.16 0-.42.06-.64.3-.22.25-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.7 2.6 4.12 3.65 2.42 1.05 2.42.7 2.86.66.45-.04 1.46-.6 1.66-1.18.2-.58.2-1.08.14-1.18-.06-.1-.22-.16-.47-.28Z" />
+                                    </svg>
+                                </span>
+                                <span>WhatsApp</span>
+                            </a>
+
+                            <button class="item-contato item-contato-inativo" type="button" aria-label="Instagram">
+                                <span class="icone-contato" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" role="img">
+                                        <path
+                                            d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2.2A2.8 2.8 0 0 0 4.2 7v10A2.8 2.8 0 0 0 7 19.8h10a2.8 2.8 0 0 0 2.8-2.8V7A2.8 2.8 0 0 0 17 4.2H7Zm10.25 1.65a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2.2A2.8 2.8 0 1 0 12 14.8 2.8 2.8 0 0 0 12 9.2Z" />
+                                    </svg>
+                                </span>
+                                <span>Instagram</span>
+                            </button>
+
+                            <button class="item-contato item-contato-inativo" type="button" aria-label="Google Maps">
+                                <span class="icone-contato" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" role="img">
+                                        <path
+                                            d="M12 2a7 7 0 0 1 7 7c0 4.78-5.12 11.72-6.42 13.4a.75.75 0 0 1-1.16 0C10.12 20.72 5 13.78 5 9a7 7 0 0 1 7-7Zm0 9.5A2.5 2.5 0 1 0 12 6.5a2.5 2.5 0 0 0 0 5Z" />
+                                    </svg>
+                                </span>
+                                <span>Maps</span>
+                            </button>
+
+                            <button class="item-contato item-contato-inativo" type="button"
+                                aria-label="Ver horarios disponiveis">
+                                <span class="icone-contato" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" role="img">
+                                        <path
+                                            d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v11a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm13 8H4v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8Zm-8-4a1 1 0 0 1 1 1v4.38l2.45 1.4a1 1 0 0 1-.98 1.74l-2.95-1.68A1 1 0 0 1 11 12V7a1 1 0 0 1 1-1Z" />
+                                    </svg>
+                                </span>
+                                <span>Hor&aacute;rios</span>
+                            </button>
+                        </nav>
+                    </header>
+
+                </div>
+
+
+
+                <aside class="cartao bloco-secao cartao-login-cliente" data-modo-simples="alternar"
+                    aria-labelledby="titulo-login-cliente">
+                    <div class="cabecalho-secao">
+                        <p class="passo-secao">Area do cliente</p>
+                        <h2 id="titulo-login-cliente">Acesso rapido</h2>
+                        <p>Entre com nome e telefone para localizar e cancelar seu agendamento, se surgir um imprevisto.
+                        </p>
+                    </div>
+
+                    <div class="campos-login-cliente">
+                        <label class="grupo-campo" for="nome-login-cliente">
+                            <span>Nome</span>
+                            <input type="text" id="nome-login-cliente" name="nome-login-cliente"
+                                placeholder="Ex.: Joao Silva">
+                        </label>
+
+                        <label class="grupo-campo" for="telefone-login-cliente">
+                            <span>Numero de telefone</span>
+                            <input type="tel" id="telefone-login-cliente" name="telefone-login-cliente"
+                                placeholder="(11) 99999-9999">
+                        </label>
+                    </div>
+
+                    <div class="acoes-login-cliente">
+                        <button id="botao-login-cliente" class="botao-principal botao-principal-menor" type="button">
+                            Entrar
+                        </button>
+                        <button id="botao-sair-cliente" class="botao-secundario oculto" type="button">
+                            Limpar
+                        </button>
+                    </div>
+
+                    <p id="mensagem-login-cliente" class="mensagem-status oculto" aria-live="polite"></p>
+
+                    <section id="painel-agendamentos-cliente" class="painel-agendamentos-cliente oculto"
+                        aria-labelledby="titulo-cancelamento-cliente">
+                        <div class="cabecalho-painel-cliente">
+                            <div>
+                                <strong id="titulo-cancelamento-cliente">Cancelar meu agendamento</strong>
+                                <p>Somente horarios futuros e ainda ativos aparecem aqui.</p>
+                            </div>
+                        </div>
+                        <div id="lista-agendamentos-cliente" class="lista-agendamentos-cliente"></div>
+                    </section>
+
+                    <section id="painel-historico-cliente" class="painel-agendamentos-cliente oculto"
+                        aria-labelledby="titulo-historico-cliente">
+                        <div class="cabecalho-painel-cliente">
+                            <div>
+                                <strong id="titulo-historico-cliente">Meu historico e reagendamento</strong>
+                                <p>Veja atendimentos anteriores e reaproveite um servico em poucos cliques.</p>
+                            </div>
+                        </div>
+                        <div id="lista-historico-cliente" class="lista-agendamentos-cliente"></div>
+                    </section>
+                </aside>
+            </div>
+
+            <div class="etapas-agendamento">
+                <section class="cartao bloco-secao etapa-agendamento etapa-servicos" aria-labelledby="titulo-servicos">
+                    <div class="cabecalho-secao">
+                        <p class="passo-secao">Passo 1</p>
+                        <h2 id="titulo-servicos">Escolha seu servi&ccedil;o</h2>
+                        <p>Selecione uma op&ccedil;&atilde;o para agendar em segundos com confirma&ccedil;&atilde;o
+                            imediata.</p>
+                    </div>
+
+                    <form id="formulario-servicos" class="lista-servicos">
+                        <label class="cartao-servico" for="servico-barba">
+                            <input type="radio" name="servico" id="servico-barba" value="Barba" data-duracao="30 min"
+                                data-preco="R$40,00">
+                            <span class="radio-servico" aria-hidden="true"></span>
+                            <span class="info-servico">
+                                <strong>Barba</strong>
+                                <small>30 min</small>
+                            </span>
+                            <span class="preco-servico">R$40,00</span>
+                        </label>
+
+                        <label class="cartao-servico" for="servico-barba-sobrancelha">
+                            <input type="radio" name="servico" id="servico-barba-sobrancelha"
+                                value="Barba / Sobrancelha" data-duracao="30 min" data-preco="R$55,00">
+                            <span class="radio-servico" aria-hidden="true"></span>
+                            <span class="info-servico">
+                                <strong>Barba / Sobrancelha</strong>
+                                <small>30 min</small>
+                            </span>
+                            <span class="preco-servico">R$55,00</span>
+                        </label>
+
+                        <label class="cartao-servico" for="servico-cabelo">
+                            <input type="radio" name="servico" id="servico-cabelo" value="Cabelo" data-duracao="30 min"
+                                data-preco="R$40,00">
+                            <span class="radio-servico" aria-hidden="true"></span>
+                            <span class="info-servico">
+                                <strong>Cabelo</strong>
+                                <small>30 min</small>
+                            </span>
+                            <span class="preco-servico">R$40,00</span>
+                        </label>
+
+                        <label class="cartao-servico" for="servico-cabelo-barba">
+                            <input type="radio" name="servico" id="servico-cabelo-barba" value="Cabelo e Barba"
+                                data-duracao="1h" data-preco="R$75,00">
+                            <span class="radio-servico" aria-hidden="true"></span>
+                            <span class="info-servico">
+                                <strong>Cabelo e Barba</strong>
+                                <small>1h</small>
+                            </span>
+                            <span class="preco-servico">R$75,00</span>
+                        </label>
+
+                        <label class="cartao-servico" for="servico-cabelo-barba-sobrancelha">
+                            <input type="radio" name="servico" id="servico-cabelo-barba-sobrancelha"
+                                value="Cabelo / Barba / Sobrancelha" data-duracao="1h" data-preco="R$90,00">
+                            <span class="radio-servico" aria-hidden="true"></span>
+                            <span class="info-servico">
+                                <strong>Cabelo / Barba / Sobrancelha</strong>
+                                <small>1h</small>
+                            </span>
+                            <span class="preco-servico">R$90,00</span>
+                        </label>
+
+                        <label class="cartao-servico" for="servico-cabelo-sobrancelha">
+                            <input type="radio" name="servico" id="servico-cabelo-sobrancelha"
+                                value="Cabelo / Sobrancelha" data-duracao="30 min" data-preco="R$55,00">
+                            <span class="radio-servico" aria-hidden="true"></span>
+                            <span class="info-servico">
+                                <strong>Cabelo / Sobrancelha</strong>
+                                <small>30 min</small>
+                            </span>
+                            <span class="preco-servico">R$55,00</span>
+                        </label>
+                    </form>
+
+                    <button id="botao-abrir-agendamento" class="botao-principal oculto" type="button">
+                        Agendar hor&aacute;rio
+                    </button>
+                </section>
+
+                <section id="secao-horarios" class="cartao bloco-secao oculto etapa-agendamento etapa-horarios"
+                    aria-labelledby="titulo-horarios">
+                    <div class="cabecalho-secao">
+                        <p class="passo-secao">Passo 2</p>
+                        <h2 id="titulo-horarios">Escolha a data, o hor&aacute;rio e confirme</h2>
+                        <p>Fluxo r&aacute;pido, confirma&ccedil;&atilde;o imediata e sem espera no WhatsApp.</p>
+                    </div>
+
+                    <div class="campos-agendamento">
+                        <div class="grade-campos">
+                            <label class="grupo-campo" for="nome-cliente">
+                                <span>Seu nome</span>
+                                <input type="text" id="nome-cliente" name="nome-cliente" placeholder="Ex.: Joao Silva">
+                            </label>
+
+                            <label class="grupo-campo" for="telefone-cliente">
+                                <span>Telefone</span>
+                                <input type="tel" id="telefone-cliente" name="telefone-cliente"
+                                    placeholder="(11) 99999-9999">
+                            </label>
+                        </div>
+
+                        <label class="grupo-campo grupo-campo-data" for="data-agendamento">
+                            <div class="cabecalho-campo-com-acao">
+                                <span>Escolher data</span>
+                                <button id="botao-escolher-data" class="botao-secundario botao-escolher-data"
+                                    type="button">
+                                    Escolher data
+                                </button>
+                            </div>
+                            <input type="date" id="data-agendamento" name="data-agendamento" class="input-data-oculto">
+                            <p id="texto-data-selecionada" class="ajuda-campo">Semana atual visivel abaixo. Para outra
+                                data, use o botao Escolher data.</p>
+                            <p id="texto-ajuda-datas" class="ajuda-campo">Somente os dias desta semana aparecem na
+                                selecao rapida.</p>
+                            <div class="grade-datas" id="grade-datas"></div>
+                        </label>
+
+                        <div class="grupo-campo">
+                            <span>Escolher hor&aacute;rio dispon&iacute;vel</span>
+                            <p id="texto-ajuda-horarios" class="ajuda-campo">Escolha uma data para consultar os
+                                hor&aacute;rios. Atendimento de segunda a s&aacute;bado, das 09:00 &agrave;s 17:00.
+                                Domingo &eacute; folga.</p>
+                            <div class="grade-horarios" id="grade-horarios"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="secao-lista-espera" class="cartao bloco-secao oculto" data-modo-simples="ocultar"
+                    aria-labelledby="titulo-lista-espera">
+                    <div class="cabecalho-secao">
+                        <p class="passo-secao">Lista de espera</p>
+                        <h2 id="titulo-lista-espera">Nao encontrou horario?</h2>
+                        <p id="texto-lista-espera-data">Entre na lista de espera para ser chamado se surgir uma vaga.
+                        </p>
+                    </div>
+
+                    <div class="campos-agendamento">
+                        <label class="grupo-campo" for="observacoes-lista-espera">
+                            <span>Observacoes opcionais</span>
+                            <textarea id="observacoes-lista-espera" name="observacoes-lista-espera"
+                                placeholder="Ex.: prefiro final da tarde ou qualquer encaixe apos as 15h"></textarea>
+                        </label>
+                    </div>
+
+                    <button id="botao-entrar-lista-espera" class="botao-secundario botao-secundario-link" type="button">
+                        Entrar na lista de espera
+                    </button>
+
+                    <p id="mensagem-lista-espera" class="mensagem-status oculto" aria-live="polite"></p>
+                </section>
+
+                <section id="secao-confirmacao" class="cartao bloco-secao oculto" aria-labelledby="titulo-confirmacao">
+                    <div class="cabecalho-secao">
+                        <p class="passo-secao">Passo 3</p>
+                        <h2 id="titulo-confirmacao">Confirma&ccedil;&atilde;o</h2>
+                        <p>Revise e confirme para garantir seu hor&aacute;rio sem enrola&ccedil;&atilde;o.</p>
+                    </div>
+
+                    <div class="lista-resumo">
+                        <div class="item-resumo">
+                            <span>Cliente</span>
+                            <strong id="resumo-cliente">-</strong>
+                        </div>
+                        <div class="item-resumo">
+                            <span>Servi&ccedil;o escolhido</span>
+                            <strong id="resumo-servico">-</strong>
+                        </div>
+                        <div class="item-resumo">
+                            <span>Data</span>
+                            <strong id="resumo-data">-</strong>
+                        </div>
+                        <div class="item-resumo">
+                            <span>Hor&aacute;rio</span>
+                            <strong id="resumo-horario">-</strong>
+                        </div>
+                    </div>
+
+                    <button id="botao-confirmar" class="botao-principal" type="button">
+                        Confirmar agendamento
+                    </button>
+
+                    <p id="mensagem-agendamento" class="mensagem-status oculto" aria-live="polite"></p>
+
+                    <section id="painel-sucesso-agendamento" class="painel-sucesso-agendamento oculto"
+                        aria-labelledby="titulo-sucesso-agendamento">
+                        <div class="cabecalho-painel-sucesso">
+                            <strong id="titulo-sucesso-agendamento">Agendamento confirmado</strong>
+                            <p id="texto-sucesso-agendamento">Seu horario foi salvo com sucesso.</p>
+                        </div>
+
+                        <div class="acoes-sucesso-agendamento">
+                            <a id="link-whatsapp-confirmacao" class="botao-secundario oculto" href="#" target="_blank"
+                                rel="noreferrer">Abrir confirma&ccedil;&atilde;o no WhatsApp</a>
+                            <button id="botao-adicionar-calendario" class="botao-secundario" type="button">
+                                Adicionar ao calendario
+                            </button>
+                            <button id="botao-novo-agendamento" class="botao-principal botao-principal-menor"
+                                type="button">
+                                Agendar outro horario
+                            </button>
+                        </div>
+                    </section>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/script.min.js"></script>
+</body>
+
+</html>
