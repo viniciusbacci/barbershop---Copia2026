@@ -99,21 +99,10 @@ function criarHorariosPadrao() {
 
   return horarios;
 }
-
 function obterUrlBaseApi() {
-return "https://barbershop-api-4g5z.onrender.com";
+  return "https://barbershop-api-4g5z.onrender.com";
 }
-  // Rodando local (VS Code, Live Server, etc)
-  if (
-    window.location.hostname.includes("localhost") ||
-    window.location.protocol === "file:"
-  ) {
-    return "http://localhost:3333";
-  }
 
-  // Produção (Vercel, Render, etc)
-  return API_URL_PRODUCAO;
-}
 function obterUrlApi(caminho) {
   return `${URL_BASE_API}${caminho}`;
 }
