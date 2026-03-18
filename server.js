@@ -372,6 +372,7 @@ function enviarJson(resposta, statusCode, dados) {
 
 function enviarTexto(resposta, statusCode, texto) {
   resposta.writeHead(statusCode, {
+    ...obterCabecalhosApi(),
     "Content-Type": "text/plain; charset=utf-8",
   });
   resposta.end(texto);
@@ -726,7 +727,9 @@ function resolverArquivoEstatico(caminhoUrl) {
 
   const caminhoRelativo = caminhoUrl.replace(/^\/+/, "");
   const diretorioPublico = path.join(DIRETORIO_BASE, "public");
-  const caminhoArquivo = path.normalize(path.join(diretorioPublico, caminhoRelativo));
+  const caminhoArquivo = path.normalize(
+    path.join(diretorioPublico, caminhoRelativo),
+  );
 
   if (!caminhoArquivo.startsWith(diretorioPublico)) {
     return null;
@@ -1375,6 +1378,11 @@ async function tratarRotasApi(requisicao, resposta, url) {
 }
 
 const servidor = http.createServer(async (requisicao, resposta) => {
+  if (requisicao.method === "OPTIONS") {
+    resposta.writeHead(204, obterCabecalhosApi());
+    resposta.end();
+    return;
+  }
   const url = new URL(requisicao.url, `http://${requisicao.headers.host}`);
 
   if (url.pathname.startsWith("/api/")) {
