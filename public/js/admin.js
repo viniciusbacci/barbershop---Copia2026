@@ -142,18 +142,24 @@ function formatarDiaSemana(valorData) {
 }
 
 function obterDataHoje() {
-  const hoje = new Date();
-  const ano = hoje.getFullYear();
-  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
-  const dia = String(hoje.getDate()).padStart(2, "0");
-  return `${ano}-${mes}-${dia}`;
+  const agora = new Date();
+  const formatador = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  return formatador.format(agora);
 }
 
 function obterMesAtual() {
-  const hoje = new Date();
-  const ano = hoje.getFullYear();
-  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
-  return `${ano}-${mes}`;
+  const agora = new Date();
+  const formatador = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit'
+  });
+  return formatador.format(agora).substring(0, 7);
 }
 
 function mostrarMensagemBloqueioAdmin(texto, tipo) {

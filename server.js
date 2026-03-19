@@ -5,6 +5,7 @@ const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
 const cors = require("cors");
 const PORTA = Number(process.env.PORT) || 3333;
+process.env.TZ = "America/Sao_Paulo";
 const DIRETORIO_BASE = __dirname;
 const DIRETORIO_DADOS = path.join(DIRETORIO_BASE, "dados");
 const CAMINHO_BANCO = "./barbershop.db";
@@ -410,20 +411,25 @@ function dataEhDomingo(valor) {
 }
 
 function obterDataHoje() {
-  const hoje = new Date();
-  const ano = hoje.getFullYear();
-  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
-  const dia = String(hoje.getDate()).padStart(2, "0");
-
-  return `${ano}-${mes}-${dia}`;
+  const agora = new Date();
+  const formatador = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  return formatador.format(agora);
 }
 
 function obterHorarioAgora() {
   const agora = new Date();
-  const hora = String(agora.getHours()).padStart(2, "0");
-  const minuto = String(agora.getMinutes()).padStart(2, "0");
-
-  return `${hora}:${minuto}`;
+  const formatador = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+  return formatador.format(agora);
 }
 
 function obterHorariosPassados(dataAgendamento) {
