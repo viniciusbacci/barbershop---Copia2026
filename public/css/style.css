@@ -1450,9 +1450,10 @@ a {
   #secao-confirmacao {
     grid-column: 1 / -1;
   }
-  /* SOBE TODA A ÁREA DE SERVIÇOS PRA CIMA */
-  .etapas-agendamento {
-    margin-top: -530px;
+  /* SOBE TODA A ÁREA DE SERVIÇOS PRA CIMA — sticky ao invés de margin fixo */
+  .coluna-apresentacao-index {
+    position: sticky;
+    top: 24px;
   }
 }
 

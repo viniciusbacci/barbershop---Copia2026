@@ -1073,8 +1073,8 @@ async function salvarAgendamento() {
     };
 
     mostrarMensagem(dados.mensagem, "sucesso");
-    mostrarPainelSucesso(agendamentoConfirmado);
     resetarFormulario(true);
+    mostrarPainelSucesso(agendamentoConfirmado);
   } catch (erro) {
     mostrarMensagem(erro.message, "erro");
     await carregarDatasOcupadas();
