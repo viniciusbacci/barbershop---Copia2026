@@ -1,5 +1,3 @@
-// v2
-// ================= SELETORES =================
 // ================= SELETORES =================
 const cartoesServico = document.querySelectorAll(".cartao-servico");
 const entradasServico = document.querySelectorAll('input[name="servico"]');
@@ -439,11 +437,22 @@ function obterUrlCompartilharWhatsapp(agendamento) {
 function mostrarPainelSucesso(agendamento) {
   ultimoAgendamentoConfirmado = agendamento;
   painelSucessoAtivo = true;
+
+  resumoCliente.textContent = agendamento.nomeCliente || "-";
+  resumoServico.textContent = agendamento.servico
+    ? `${agendamento.servico} (${agendamento.duracao} - ${agendamento.preco})`
+    : "-";
+  resumoData.textContent = agendamento.dataAgendamento
+    ? formatarData(agendamento.dataAgendamento)
+    : "-";
+  resumoHorario.textContent = agendamento.horarioAgendamento || "-";
+
+  secaoConfirmacao.classList.remove("oculto");
+
   textoSucessoAgendamento.textContent = `Tudo certo. Seu horario para ${agendamento.servico} esta confirmado em ${formatarData(agendamento.dataAgendamento)} as ${agendamento.horarioAgendamento}, com confirmacao imediata pronta no WhatsApp.`;
   linkWhatsappConfirmacao.href = obterUrlCompartilharWhatsapp(agendamento);
   linkWhatsappConfirmacao.classList.remove("oculto");
   painelSucessoAgendamento.classList.remove("oculto");
-  atualizarResumo();
   rolarParaElemento(painelSucessoAgendamento, linkWhatsappConfirmacao);
 }
 
@@ -1075,8 +1084,8 @@ async function salvarAgendamento() {
     };
 
     mostrarMensagem(dados.mensagem, "sucesso");
-    resetarFormulario(true);
     mostrarPainelSucesso(agendamentoConfirmado);
+    resetarFormulario(true);
   } catch (erro) {
     mostrarMensagem(erro.message, "erro");
     await carregarDatasOcupadas();

@@ -1402,58 +1402,55 @@ a {
   }
 }
 @media (min-width: 1100px) {
-  .layout-topo-index {
+  .app-agendamento {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
     gap: 24px;
     align-items: start;
   }
 
-  /* ESQUERDA */
-  .coluna-apresentacao-index {
+  .layout-topo-index {
     grid-column: 1;
-    grid-row: 1 / span 3;
+    grid-row: 1;
+    display: block;
+    position: sticky;
+    top: 24px;
   }
 
-  /* BOTÃO */
-  .botao-toggle-area-cliente {
+  .coluna-apresentacao-index {
+    display: grid;
+    gap: 18px;
+  }
+
+  .cartao-login-cliente {
+    margin-top: 0;
+  }
+
+  .etapas-agendamento {
     grid-column: 2;
     grid-row: 1;
-    justify-self: end;
-  }
-
-  /* SERVIÇOS SOBEM PRA DIREITA */
-  .etapas-agendamento {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
+    grid-template-columns: 1fr;
     gap: 24px;
+    margin-top: 0;
   }
 
   .etapa-servicos {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: stretch;
+    grid-column: 1;
     text-align: left;
     max-width: 100%;
   }
 
-  /* ÁREA CLIENTE VAI PRA BAIXO */
-  .cartao-login-cliente {
-    position: relative;
-  }
-
-  /* HORÁRIOS FICAM EMBAIXO */
   .etapa-horarios {
-    grid-column: 1 / -1;
+    grid-column: 1;
   }
 
   #secao-confirmacao {
-    grid-column: 1 / -1;
+    grid-column: 1;
   }
-  /* SOBE TODA A ÁREA DE SERVIÇOS PRA CIMA — sticky ao invés de margin fixo */
-  .coluna-apresentacao-index {
-    position: sticky;
-    top: 24px;
+
+  .botao-toggle-area-cliente {
+    justify-self: end;
   }
 }
 
