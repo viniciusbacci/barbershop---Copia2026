@@ -1,3 +1,4 @@
+// ================= SELETORES =================
 const cartoesServico = document.querySelectorAll(".cartao-servico");
 const entradasServico = document.querySelectorAll('input[name="servico"]');
 const botaoAbrirAgendamento = document.getElementById(
@@ -70,13 +71,14 @@ const elementosModoSimplesAlternaveis = document.querySelectorAll(
   '[data-modo-simples="alternar"]',
 );
 
-const HORARIOS_PADRAO = criarHorariosPadrao();
-const URL_BASE_API = obterUrlBaseApi();
+// ================= CONFIG =================
+const URL_BASE_API = "https://barbershop-api-4g5z.onrender.com";
 const MODO_SIMPLES = true;
 const CHAVE_ACESSO_ADMIN = "barbershopAdminAutorizado";
 const CHAVE_CLIENTE = "barbershopCliente";
 const SENHA_ADMIN = "admin";
 
+// ================= ESTADO =================
 let servicoSelecionado = null;
 let dataSelecionada = "";
 let horarioSelecionado = "";
@@ -86,21 +88,20 @@ let ultimoResultadoHorarios = null;
 let ultimoAgendamentoConfirmado = null;
 let painelSucessoAtivo = false;
 
+// ================= CONSTANTES =================
+const HORARIOS_PADRAO = criarHorariosPadrao();
+
+// ================= FUNÇÕES UTILITÁRIAS =================
+
 function criarHorariosPadrao() {
   const horarios = [];
-
   for (let hora = 9; hora <= 17; hora += 1) {
     horarios.push(`${String(hora).padStart(2, "0")}:00`);
-
     if (hora !== 17) {
       horarios.push(`${String(hora).padStart(2, "0")}:30`);
     }
   }
-
   return horarios;
-}
-function obterUrlBaseApi() {
-  return "https://barbershop-api-4g5z.onrender.com";
 }
 
 function obterUrlApi(caminho) {
@@ -108,11 +109,7 @@ function obterUrlApi(caminho) {
 }
 
 function obterUrlPainelAdmin() {
-  if (URL_BASE_API) {
-    return `${URL_BASE_API}/admin`;
-  }
-
-  return `${window.location.origin}/admin`;
+  return `${URL_BASE_API}/admin`;
 }
 
 function obterDataHoje() {
@@ -120,7 +117,6 @@ function obterDataHoje() {
   const ano = hoje.getFullYear();
   const mes = String(hoje.getMonth() + 1).padStart(2, "0");
   const dia = String(hoje.getDate()).padStart(2, "0");
-
   return `${ano}-${mes}-${dia}`;
 }
 
@@ -136,28 +132,17 @@ function obterBotoesHorarioDisponiveis() {
   return gradeHorarios.querySelectorAll(".botao-horario:not(:disabled)");
 }
 
-function renderizarHorarios() {
-  gradeHorarios.innerHTML = HORARIOS_PADRAO.map(
-    (horario) => `
-        <button type="button" class="botao-horario" data-horario="${horario}">${horario}</button>
-    `,
-  ).join("");
-}
-
 function somarDias(valorData, quantidadeDias) {
   const data = new Date(`${valorData}T12:00:00`);
   data.setDate(data.getDate() + quantidadeDias);
-
   const ano = data.getFullYear();
   const mes = String(data.getMonth() + 1).padStart(2, "0");
   const dia = String(data.getDate()).padStart(2, "0");
-
   return `${ano}-${mes}-${dia}`;
 }
 
 function formatarLegendaData(valorData) {
   const data = new Date(`${valorData}T12:00:00`);
-
   return new Intl.DateTimeFormat("pt-BR", {
     weekday: "short",
     day: "2-digit",
@@ -168,10 +153,7 @@ function formatarLegendaData(valorData) {
 }
 
 function formatarData(valorData) {
-  if (!valorData) {
-    return "-";
-  }
-
+  if (!valorData) return "-";
   const [ano, mes, dia] = valorData.split("-");
   return `${dia}/${mes}/${ano}`;
 }
@@ -179,6 +161,44 @@ function formatarData(valorData) {
 function formatarDataHoraAgendamento(valorData, horario) {
   return `${formatarData(valorData)} as ${horario}`;
 }
+
+function normalizarTelefone(valor) {
+  return String(valor || "").replace(/\D/g, "");
+}
+
+function normalizarTelefoneWhatsapp(valor) {
+  const somenteDigitos = normalizarTelefone(valor);
+  if (!somenteDigitos) return "";
+  if (somenteDigitos.startsWith("55")) return somenteDigitos;
+  return `55${somenteDigitos}`;
+}
+
+function obterNomeCliente() {
+  return campoNome.value.trim();
+}
+
+function obterTelefoneCliente() {
+  return campoTelefone.value.trim();
+}
+
+function obterCredenciaisInformadas() {
+  return {
+    nomeCliente: nomeLoginCliente.value.trim(),
+    telefoneCliente: telefoneLoginCliente.value.trim(),
+  };
+}
+
+function obterPeriodoSemanaRapida() {
+  const hoje = obterDataHoje();
+  const dataHoje = new Date(`${hoje}T12:00:00`);
+  const diaSemana = dataHoje.getDay();
+  if (diaSemana === 0) {
+    return { inicio: somarDias(hoje, 1), totalDias: 6 };
+  }
+  return { inicio: hoje, totalDias: 7 - diaSemana };
+}
+
+// ================= MENSAGENS =================
 
 function limparMensagem() {
   mensagemAgendamento.textContent = "";
@@ -210,53 +230,35 @@ function limparMensagemListaEspera() {
   mensagemListaEspera.className = "mensagem-status oculto";
 }
 
+// ================= API =================
+
+async function apiFetch(url, options = {}) {
+  const resposta = await fetch(url, options);
+  if (!resposta.ok) {
+    const texto = await resposta.text();
+    throw new Error(texto || "Erro na API");
+  }
+  return await resposta.json();
+}
+
+// ================= UI HELPERS =================
+
 function rolarParaElemento(elemento, elementoFoco = null) {
-  if (!elemento) {
-    return;
-  }
-
+  if (!elemento) return;
   elemento.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  if (!elementoFoco) {
-    return;
-  }
-
+  if (!elementoFoco) return;
   window.setTimeout(() => {
     elementoFoco.focus({ preventScroll: true });
   }, 240);
 }
 
-function obterNomeCliente() {
-  return campoNome.value.trim();
-}
-
-function obterTelefoneCliente() {
-  return campoTelefone.value.trim();
-}
-
-function obterCredenciaisInformadas() {
-  return {
-    nomeCliente: nomeLoginCliente.value.trim(),
-    telefoneCliente: telefoneLoginCliente.value.trim(),
-  };
-}
-
-function normalizarTelefone(valor) {
-  return String(valor || "").replace(/\D/g, "");
-}
-
-function normalizarTelefoneWhatsapp(valor) {
-  const somenteDigitos = normalizarTelefone(valor);
-
-  if (!somenteDigitos) {
-    return "";
+function atualizarTextoDataSelecionada() {
+  if (!dataSelecionada) {
+    textoDataSelecionada.textContent =
+      "Semana atual visivel abaixo. Para outra data, use o botao Escolher data.";
+    return;
   }
-
-  if (somenteDigitos.startsWith("55")) {
-    return somenteDigitos;
-  }
-
-  return `55${somenteDigitos}`;
+  textoDataSelecionada.textContent = `Data escolhida: ${formatarData(dataSelecionada)}. Para trocar por uma data distante, use o botao Escolher data.`;
 }
 
 function atualizarResumo() {
@@ -283,17 +285,11 @@ function atualizarResumo() {
 }
 
 function aplicarModoSimples() {
-  if (!MODO_SIMPLES) {
-    return;
-  }
+  if (!MODO_SIMPLES) return;
 
   document.body.classList.add("modo-simples");
-  elementosModoSimplesOcultos.forEach((elemento) => {
-    elemento.classList.add("oculto");
-  });
-  elementosModoSimplesAlternaveis.forEach((elemento) => {
-    elemento.classList.add("oculto");
-  });
+  elementosModoSimplesOcultos.forEach((el) => el.classList.add("oculto"));
+  elementosModoSimplesAlternaveis.forEach((el) => el.classList.add("oculto"));
 
   if (botaoToggleAreaCliente) {
     botaoToggleAreaCliente.classList.remove("oculto");
@@ -303,9 +299,7 @@ function aplicarModoSimples() {
 }
 
 async function alternarAreaClienteModoSimples() {
-  if (!MODO_SIMPLES || !elementosModoSimplesAlternaveis.length) {
-    return;
-  }
+  if (!MODO_SIMPLES || !elementosModoSimplesAlternaveis.length) return;
 
   const areaCliente = elementosModoSimplesAlternaveis[0];
   const vaiAbrir = areaCliente.classList.contains("oculto");
@@ -326,7 +320,6 @@ async function alternarAreaClienteModoSimples() {
     painelHistoricoCliente.classList.add("oculto");
     limparMensagemLogin();
     clienteLogado = null;
-
     rolarParaElemento(areaCliente, nomeLoginCliente);
   }
 }
@@ -335,43 +328,126 @@ function definirDataMinima() {
   campoData.min = obterDataHoje();
 }
 
-function obterPeriodoSemanaRapida() {
-  const hoje = obterDataHoje();
-  const dataHoje = new Date(`${hoje}T12:00:00`);
-  const diaSemana = dataHoje.getDay();
-
-  if (diaSemana === 0) {
-    return {
-      inicio: somarDias(hoje, 1),
-      totalDias: 6,
-    };
-  }
-
-  return {
-    inicio: hoje,
-    totalDias: 7 - diaSemana,
-  };
+function renderizarHorarios() {
+  gradeHorarios.innerHTML = HORARIOS_PADRAO.map(
+    (horario) => `
+      <button type="button" class="botao-horario" data-horario="${horario}">${horario}</button>
+    `,
+  ).join("");
 }
 
-function atualizarTextoDataSelecionada() {
-  if (!dataSelecionada) {
-    textoDataSelecionada.textContent =
-      "Semana atual visivel abaixo. Para outra data, use o botao Escolher data.";
+function renderizarDatas() {
+  const { inicio, totalDias } = obterPeriodoSemanaRapida();
+  const datas = [];
+
+  for (let indice = 0; indice < totalDias; indice += 1) {
+    const data = somarDias(inicio, indice);
+    const ocupacao = datasComOcupacao.get(data);
+    const dataFechada = new Date(`${data}T12:00:00`).getDay() === 0;
+    const dataLotada = ocupacao?.lotada || false;
+    const quantidadeOcupada = ocupacao?.totalAgendamentos || 0;
+    const classes = ["botao-data"];
+
+    if (dataSelecionada === data) classes.push("ativo");
+    if (dataFechada) classes.push("indisponivel");
+    if (quantidadeOcupada > 0 || dataLotada) classes.push("parcial");
+
+    datas.push(`
+      <button
+        type="button"
+        class="${classes.join(" ")}"
+        data-data="${data}"
+        ${dataFechada ? "disabled" : ""}
+      >
+        <strong>${formatarLegendaData(data)}</strong>
+        <span>${dataFechada ? "Folga" : dataLotada ? "Lotado" : quantidadeOcupada > 0 ? `${quantidadeOcupada} agend.` : "Livre"}</span>
+      </button>
+    `);
+  }
+
+  gradeDatas.innerHTML = datas.join("");
+  atualizarTextoDataSelecionada();
+}
+
+function prepararHorariosSemData() {
+  horarioSelecionado = "";
+  ultimoResultadoHorarios = null;
+
+  obterBotoesHorario().forEach((botao) => {
+    botao.disabled = true;
+    botao.classList.remove("ativo");
+    botao.classList.add("indisponivel");
+  });
+
+  textoAjudaHorarios.textContent =
+    "Escolha uma data para consultar os horarios.";
+  ocultarListaEspera();
+  atualizarResumo();
+}
+
+function ocultarListaEspera() {
+  secaoListaEspera.classList.add("oculto");
+  limparMensagemListaEspera();
+}
+
+function atualizarEstadoListaEspera() {
+  const podeEntrarListaEspera =
+    servicoSelecionado &&
+    dataSelecionada &&
+    ultimoResultadoHorarios &&
+    !ultimoResultadoHorarios.diaFechado &&
+    Array.isArray(ultimoResultadoHorarios.horariosDisponiveis) &&
+    ultimoResultadoHorarios.horariosDisponiveis.length === 0;
+
+  if (!podeEntrarListaEspera) {
+    ocultarListaEspera();
     return;
   }
 
-  textoDataSelecionada.textContent = `Data escolhida: ${formatarData(dataSelecionada)}. Para trocar por uma data distante, use o botao Escolher data.`;
+  textoListaEsperaData.textContent = `A data ${formatarData(dataSelecionada)} esta sem vagas para ${servicoSelecionado.nome}. Entre na lista de espera para ser avisado se surgir um encaixe.`;
+  secaoListaEspera.classList.remove("oculto");
+}
+
+function limparPainelSucesso() {
+  painelSucessoAgendamento.classList.add("oculto");
+  textoSucessoAgendamento.textContent = "Seu horario foi salvo com sucesso.";
+  linkWhatsappConfirmacao.classList.add("oculto");
+  linkWhatsappConfirmacao.href = "#";
+}
+
+function criarMensagemCompartilhamentoAgendamento(agendamento) {
+  return encodeURIComponent(
+    [
+      "Agendamento confirmado ✅",
+      `Servico: ${agendamento.servico}`,
+      `Data: ${formatarData(agendamento.dataAgendamento)} as ${agendamento.horarioAgendamento}`,
+      "",
+      "Se precisar remarcar, e so responder aqui 👍",
+    ].join("\n"),
+  );
+}
+
+function obterUrlCompartilharWhatsapp(agendamento) {
+  const telefone = normalizarTelefoneWhatsapp(agendamento.telefoneCliente);
+  const mensagem = criarMensagemCompartilhamentoAgendamento(agendamento);
+  if (telefone) return `https://wa.me/${telefone}?text=${mensagem}`;
+  return `https://wa.me/?text=${mensagem}`;
+}
+
+function mostrarPainelSucesso(agendamento) {
+  ultimoAgendamentoConfirmado = agendamento;
+  painelSucessoAtivo = true;
+  textoSucessoAgendamento.textContent = `Tudo certo. Seu horario para ${agendamento.servico} esta confirmado em ${formatarData(agendamento.dataAgendamento)} as ${agendamento.horarioAgendamento}, com confirmacao imediata pronta no WhatsApp.`;
+  linkWhatsappConfirmacao.href = obterUrlCompartilharWhatsapp(agendamento);
+  linkWhatsappConfirmacao.classList.remove("oculto");
+  painelSucessoAgendamento.classList.remove("oculto");
+  atualizarResumo();
+  rolarParaElemento(painelSucessoAgendamento, linkWhatsappConfirmacao);
 }
 
 function formatarStatusHistorico(agendamento) {
-  if (agendamento.status === "cancelado") {
-    return "Cancelado";
-  }
-
-  if (agendamento.status === "concluido") {
-    return "Concluido";
-  }
-
+  if (agendamento.status === "cancelado") return "Cancelado";
+  if (agendamento.status === "concluido") return "Concluido";
   const dataHoraAgendamento = `${agendamento.dataAgendamento}T${agendamento.horarioAgendamento}:00`;
   return new Date(dataHoraAgendamento) >= new Date()
     ? "Agendado"
@@ -389,15 +465,8 @@ function obterDuracaoEmMinutos(textoDuracao) {
   const valor = String(textoDuracao || "")
     .toLowerCase()
     .trim();
-
-  if (valor.endsWith("min")) {
-    return Number.parseInt(valor, 10) || 30;
-  }
-
-  if (valor.endsWith("h")) {
-    return (Number.parseInt(valor, 10) || 1) * 60;
-  }
-
+  if (valor.endsWith("min")) return Number.parseInt(valor, 10) || 30;
+  if (valor.endsWith("h")) return (Number.parseInt(valor, 10) || 1) * 60;
   return 30;
 }
 
@@ -439,7 +508,6 @@ function baixarArquivo(nomeArquivo, conteudo, tipo) {
   const blob = new Blob([conteudo], { type: tipo });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-
   link.href = url;
   link.download = nomeArquivo;
   document.body.appendChild(link);
@@ -448,171 +516,121 @@ function baixarArquivo(nomeArquivo, conteudo, tipo) {
   URL.revokeObjectURL(url);
 }
 
-function criarMensagemCompartilhamentoAgendamento(agendamento) {
-  return encodeURIComponent(
-    [
-      "Agendamento confirmado ✅",
-      `Servico: ${agendamento.servico}`,
-      `Data: ${formatarData(agendamento.dataAgendamento)} as ${agendamento.horarioAgendamento}`,
-      "",
-      "Se precisar remarcar, e so responder aqui 👍",
-    ].join("\n"),
-  );
-}
+// ================= RENDERIZAÇÃO DE LISTAS =================
 
-function obterUrlCompartilharWhatsapp(agendamento) {
-  const telefone = normalizarTelefoneWhatsapp(agendamento.telefoneCliente);
-  const mensagem = criarMensagemCompartilhamentoAgendamento(agendamento);
+function renderizarListaAgendamentosCliente(agendamentos) {
+  painelAgendamentosCliente.classList.remove("oculto");
 
-  if (telefone) {
-    return `https://wa.me/${telefone}?text=${mensagem}`;
-  }
-
-  return `https://wa.me/?text=${mensagem}`;
-}
-
-function limparPainelSucesso() {
-  painelSucessoAgendamento.classList.add("oculto");
-  textoSucessoAgendamento.textContent = "Seu horario foi salvo com sucesso.";
-  linkWhatsappConfirmacao.classList.add("oculto");
-  linkWhatsappConfirmacao.href = "#";
-}
-
-function mostrarPainelSucesso(agendamento) {
-  ultimoAgendamentoConfirmado = agendamento;
-  painelSucessoAtivo = true;
-  textoSucessoAgendamento.textContent = `Tudo certo. Seu horario para ${agendamento.servico} esta confirmado em ${formatarData(agendamento.dataAgendamento)} as ${agendamento.horarioAgendamento}, com confirmacao imediata pronta no WhatsApp.`;
-  linkWhatsappConfirmacao.href = obterUrlCompartilharWhatsapp(agendamento);
-  linkWhatsappConfirmacao.classList.remove("oculto");
-  painelSucessoAgendamento.classList.remove("oculto");
-  atualizarResumo();
-  rolarParaElemento(painelSucessoAgendamento, linkWhatsappConfirmacao);
-}
-
-function ocultarListaEspera() {
-  secaoListaEspera.classList.add("oculto");
-  limparMensagemListaEspera();
-}
-
-function atualizarEstadoListaEspera() {
-  const podeEntrarListaEspera =
-    servicoSelecionado &&
-    dataSelecionada &&
-    ultimoResultadoHorarios &&
-    !ultimoResultadoHorarios.diaFechado &&
-    Array.isArray(ultimoResultadoHorarios.horariosDisponiveis) &&
-    ultimoResultadoHorarios.horariosDisponiveis.length === 0;
-
-  if (!podeEntrarListaEspera) {
-    ocultarListaEspera();
+  if (!agendamentos.length) {
+    listaAgendamentosCliente.innerHTML = `
+      <article class="item-agendamento-cliente item-agendamento-cliente-vazio">
+        <strong>Nenhum horario futuro encontrado.</strong>
+        <p>Se voce acabou de agendar, atualize em alguns segundos ou confira nome e telefone informados.</p>
+      </article>
+    `;
     return;
   }
 
-  textoListaEsperaData.textContent = `A data ${formatarData(dataSelecionada)} esta sem vagas para ${servicoSelecionado.nome}. Entre na lista de espera para ser avisado se surgir um encaixe.`;
-  secaoListaEspera.classList.remove("oculto");
+  listaAgendamentosCliente.innerHTML = agendamentos
+    .map(
+      (agendamento) => `
+      <article class="item-agendamento-cliente">
+        <div class="item-agendamento-cliente-topo">
+          <strong>${agendamento.servico}</strong>
+          <span>${agendamento.horarioAgendamento}</span>
+        </div>
+        <p>${formatarDataHoraAgendamento(agendamento.dataAgendamento, agendamento.horarioAgendamento)}</p>
+        <button class="botao-secundario botao-cancelar-cliente" type="button" data-id="${Number(agendamento.id)}">
+          Cancelar meu agendamento
+        </button>
+      </article>
+    `,
+    )
+    .join("");
 }
 
-function renderizarDatas() {
-  const { inicio, totalDias } = obterPeriodoSemanaRapida();
-  const datas = [];
+function renderizarHistoricoCliente(historico) {
+  painelHistoricoCliente.classList.remove("oculto");
 
-  for (let indice = 0; indice < totalDias; indice += 1) {
-    const data = somarDias(inicio, indice);
-    const ocupacao = datasComOcupacao.get(data);
-    const dataFechada = new Date(`${data}T12:00:00`).getDay() === 0;
-    const dataLotada = ocupacao?.lotada || false;
-    const quantidadeOcupada = ocupacao?.totalAgendamentos || 0;
-    const classes = ["botao-data"];
-
-    if (dataSelecionada === data) {
-      classes.push("ativo");
-    }
-
-    if (dataFechada) {
-      classes.push("indisponivel");
-    }
-
-    if (quantidadeOcupada > 0 || dataLotada) {
-      classes.push("parcial");
-    }
-
-    datas.push(`
-            <button
-                type="button"
-                class="${classes.join(" ")}"
-                data-data="${data}"
-                ${dataFechada ? "disabled" : ""}
-            >
-                <strong>${formatarLegendaData(data)}</strong>
-                <span>${dataFechada ? "Folga" : dataLotada ? "Lotado" : quantidadeOcupada > 0 ? `${quantidadeOcupada} agend.` : "Livre"}</span>
-            </button>
-        `);
+  if (!historico.length) {
+    listaHistoricoCliente.innerHTML = `
+      <article class="item-agendamento-cliente item-agendamento-cliente-vazio">
+        <strong>Nenhum historico encontrado.</strong>
+        <p>Assim que houver atendimento salvo para este cliente, ele aparecera aqui.</p>
+      </article>
+    `;
+    return;
   }
 
-  gradeDatas.innerHTML = datas.join("");
-  atualizarTextoDataSelecionada();
+  listaHistoricoCliente.innerHTML = historico
+    .map(
+      (agendamento) => `
+      <article class="item-agendamento-cliente">
+        <div class="item-agendamento-cliente-topo">
+          <strong>${agendamento.servico}</strong>
+          <span class="tag-historico-status ${obterClasseStatusHistorico(agendamento)}">${formatarStatusHistorico(agendamento)}</span>
+        </div>
+        <p>${formatarDataHoraAgendamento(agendamento.dataAgendamento, agendamento.horarioAgendamento)}</p>
+        <button class="botao-secundario botao-reagendar-cliente" type="button" data-servico="${agendamento.servico}">
+          Agendar este servico novamente
+        </button>
+      </article>
+    `,
+    )
+    .join("");
 }
 
-async function carregarDatasOcupadas() {
-  textoAjudaDatas.textContent = "Atualizando dias da semana...";
+// ================= CREDENCIAIS DO CLIENTE =================
 
+function salvarCredenciaisClienteLocalmente(cliente) {
+  window.localStorage.setItem(CHAVE_CLIENTE, JSON.stringify(cliente));
+}
+
+function restaurarCredenciaisCliente() {
   try {
-    const periodo = obterPeriodoSemanaRapida();
-    const resposta = await fetch(
-      obterUrlApi(
-        `/api/datas-ocupadas?inicio=${encodeURIComponent(periodo.inicio)}&dias=${periodo.totalDias}`,
-      ),
+    const clienteSalvo = JSON.parse(
+      window.localStorage.getItem(CHAVE_CLIENTE) || "null",
     );
-    const tipoConteudo = resposta.headers.get("content-type") || "";
-
-    if (!tipoConteudo.includes("application/json")) {
-      throw new Error(
-        "A API nao respondeu em JSON. Rode o Node em http://127.0.0.1:3000.",
-      );
-    }
-
-    const dados = await resposta.json();
-
-    if (!resposta.ok) {
-      throw new Error(
-        dados.erro || "Nao foi possivel consultar as datas ocupadas.",
-      );
-    }
-
-    datasComOcupacao = new Map(
-      (dados.datas || []).map((item) => [item.data, item]),
-    );
-    renderizarDatas();
-    textoAjudaDatas.textContent =
-      "A selecao rapida mostra apenas a semana atual. Para outras datas, use o calendario.";
-  } catch (erro) {
-    datasComOcupacao = new Map();
-    renderizarDatas();
-    textoAjudaDatas.textContent = erro.message;
+    if (!clienteSalvo?.nomeCliente || !clienteSalvo?.telefoneCliente)
+      return null;
+    return clienteSalvo;
+  } catch {
+    return null;
   }
 }
 
-function prepararHorariosSemData() {
-  horarioSelecionado = "";
-  ultimoResultadoHorarios = null;
-
-  obterBotoesHorario().forEach((botao) => {
-    botao.disabled = true;
-    botao.classList.remove("ativo");
-    botao.classList.add("indisponivel");
-  });
-
-  textoAjudaHorarios.textContent =
-    "Escolha uma data para consultar os horarios.";
-  ocultarListaEspera();
+function aplicarCredenciaisCliente(cliente) {
+  clienteLogado = cliente;
+  nomeLoginCliente.value = cliente.nomeCliente;
+  telefoneLoginCliente.value = cliente.telefoneCliente;
+  botaoSairCliente.classList.remove("oculto");
+  campoNome.value = cliente.nomeCliente;
+  campoTelefone.value = cliente.telefoneCliente;
   atualizarResumo();
 }
 
-function selecionarServico(entrada) {
-  cartoesServico.forEach((cartao) => {
-    cartao.classList.remove("esta-selecionado");
-  });
+function limparAcessoCliente() {
+  clienteLogado = null;
+  nomeLoginCliente.value = "";
+  telefoneLoginCliente.value = "";
+  campoNome.value = "";
+  campoTelefone.value = "";
+  botaoSairCliente.classList.add("oculto");
+  painelAgendamentosCliente.classList.add("oculto");
+  painelHistoricoCliente.classList.add("oculto");
+  listaAgendamentosCliente.innerHTML = "";
+  listaHistoricoCliente.innerHTML = "";
+  limparMensagemLogin();
+  window.localStorage.removeItem(CHAVE_CLIENTE);
+  atualizarResumo();
+}
 
+// ================= FUNÇÕES DE SERVIÇO/DATA/HORÁRIO =================
+
+function selecionarServico(entrada) {
+  cartoesServico.forEach((cartao) =>
+    cartao.classList.remove("esta-selecionado"),
+  );
   entrada.checked = true;
   entrada.closest(".cartao-servico").classList.add("esta-selecionado");
 
@@ -634,9 +652,7 @@ function selecionarServico(entrada) {
 }
 
 function mostrarSecaoHorarios(focarProximaEtapa = false) {
-  if (!servicoSelecionado) {
-    return;
-  }
+  if (!servicoSelecionado) return;
 
   secaoHorarios.classList.remove("oculto");
 
@@ -650,9 +666,7 @@ function mostrarSecaoHorarios(focarProximaEtapa = false) {
 }
 
 function selecionarHorario(botao) {
-  if (botao.disabled) {
-    return;
-  }
+  if (botao.disabled) return;
 
   const nome = obterNomeCliente();
   const telefone = normalizarTelefone(obterTelefoneCliente());
@@ -668,16 +682,124 @@ function selecionarHorario(botao) {
     return;
   }
 
-  obterBotoesHorario().forEach((botaoHorario) => {
-    botaoHorario.classList.remove("ativo");
-  });
-
+  obterBotoesHorario().forEach((b) => b.classList.remove("ativo"));
   botao.classList.add("ativo");
   horarioSelecionado = botao.dataset.horario;
   atualizarResumo();
 
   if (MODO_SIMPLES) {
     tentarGuiarConfirmacaoModoSimples();
+  }
+}
+
+function tentarGuiarConfirmacaoModoSimples() {
+  if (!MODO_SIMPLES) return;
+  if (
+    !servicoSelecionado ||
+    !dataSelecionada ||
+    !horarioSelecionado ||
+    obterNomeCliente().length < 3 ||
+    normalizarTelefone(obterTelefoneCliente()).length < 8
+  )
+    return;
+
+  rolarParaElemento(secaoConfirmacao, botaoConfirmar);
+}
+
+function abrirCalendarioCompleto() {
+  if (typeof campoData.showPicker === "function") {
+    campoData.showPicker();
+    return;
+  }
+  campoData.focus();
+  campoData.click();
+}
+
+function abrirPainelAdmin() {
+  const senhaInformada = window.prompt("Digite a senha do painel admin:");
+  if (senhaInformada === null) return;
+  if (senhaInformada !== SENHA_ADMIN) {
+    window.alert("Senha incorreta.");
+    return;
+  }
+  window.localStorage.setItem(CHAVE_ACESSO_ADMIN, SENHA_ADMIN);
+  window.open(obterUrlPainelAdmin(), "_blank", "noopener");
+}
+
+function selecionarServicoPorNome(nomeServico) {
+  const entrada = Array.from(entradasServico).find(
+    (item) => item.value === nomeServico,
+  );
+  if (!entrada) return false;
+  selecionarServico(entrada);
+  return true;
+}
+
+function prepararReagendamento(nomeServico) {
+  if (!selecionarServicoPorNome(nomeServico)) return;
+  dataSelecionada = "";
+  horarioSelecionado = "";
+  campoData.value = "";
+  painelSucessoAtivo = false;
+  limparPainelSucesso();
+  renderizarDatas();
+  prepararHorariosSemData();
+  mostrarSecaoHorarios(MODO_SIMPLES);
+  atualizarResumo();
+}
+
+function resetarFormulario(preservarPainelSucesso = false) {
+  entradasServico.forEach((entrada) => {
+    entrada.checked = false;
+  });
+  cartoesServico.forEach((cartao) =>
+    cartao.classList.remove("esta-selecionado"),
+  );
+
+  servicoSelecionado = null;
+  dataSelecionada = "";
+  horarioSelecionado = "";
+  campoData.value = "";
+  campoNome.value = clienteLogado?.nomeCliente || "";
+  campoTelefone.value = clienteLogado?.telefoneCliente || "";
+
+  botaoAbrirAgendamento.classList.add("oculto");
+  secaoHorarios.classList.add("oculto");
+
+  if (!preservarPainelSucesso) {
+    painelSucessoAtivo = false;
+    limparPainelSucesso();
+    secaoConfirmacao.classList.add("oculto");
+  }
+
+  prepararHorariosSemData();
+  renderizarDatas();
+  atualizarResumo();
+}
+
+// ================= CHAMADAS DE API =================
+
+async function carregarDatasOcupadas() {
+  textoAjudaDatas.textContent = "Atualizando dias da semana...";
+
+  try {
+    const periodo = obterPeriodoSemanaRapida();
+    const dados = await apiFetch(
+      obterUrlApi(
+        `/api/datas-ocupadas?inicio=${encodeURIComponent(periodo.inicio)}&dias=${periodo.totalDias}`,
+      ),
+    );
+
+    datasComOcupacao = new Map(
+      (dados.datas || []).map((item) => [item.data, item]),
+    );
+    renderizarDatas();
+    textoAjudaDatas.textContent =
+      "A selecao rapida mostra apenas a semana atual. Para outras datas, use o calendario.";
+  } catch (erro) {
+    datasComOcupacao = new Map();
+    renderizarDatas();
+    textoAjudaDatas.textContent = erro.message;
   }
 }
 
@@ -692,23 +814,10 @@ async function carregarHorariosDaData(data) {
   });
 
   try {
-    const resposta = await fetch(
+    const dados = await apiFetch(
       obterUrlApi(`/api/horarios?data=${encodeURIComponent(data)}`),
     );
-    const tipoConteudo = resposta.headers.get("content-type") || "";
-
-    if (!tipoConteudo.includes("application/json")) {
-      throw new Error(
-        "A API nao respondeu em JSON. Rode o Node em http://127.0.0.1:3000.",
-      );
-    }
-
-    const dados = await resposta.json();
     ultimoResultadoHorarios = dados;
-
-    if (!resposta.ok) {
-      throw new Error(dados.erro || "Nao foi possivel consultar os horarios.");
-    }
 
     if (dados.diaFechado) {
       prepararHorariosSemData();
@@ -724,7 +833,6 @@ async function carregarHorariosDaData(data) {
         dados.horariosOcupados ||
         []
       ).includes(horario);
-
       botao.disabled = horarioIndisponivel;
       botao.classList.toggle("indisponivel", horarioIndisponivel);
       botao.classList.remove("ativo");
@@ -750,7 +858,6 @@ async function carregarHorariosDaData(data) {
 
     if (MODO_SIMPLES) {
       const primeiroHorarioDisponivel = obterBotoesHorarioDisponiveis()[0];
-
       if (primeiroHorarioDisponivel) {
         rolarParaElemento(gradeHorarios, primeiroHorarioDisponivel);
       }
@@ -777,187 +884,16 @@ async function selecionarData(valorData) {
   await carregarHorariosDaData(dataSelecionada);
 }
 
-function abrirCalendarioCompleto() {
-  if (typeof campoData.showPicker === "function") {
-    campoData.showPicker();
-    return;
-  }
-
-  campoData.focus();
-  campoData.click();
-}
-
-function tentarGuiarConfirmacaoModoSimples() {
-  if (!MODO_SIMPLES) {
-    return;
-  }
-
-  if (
-    !servicoSelecionado ||
-    !dataSelecionada ||
-    !horarioSelecionado ||
-    obterNomeCliente().length < 3 ||
-    normalizarTelefone(obterTelefoneCliente()).length < 8
-  ) {
-    return;
-  }
-
-  rolarParaElemento(secaoConfirmacao, botaoConfirmar);
-}
-
-function abrirPainelAdmin() {
-  const senhaInformada = window.prompt("Digite a senha do painel admin:");
-
-  if (senhaInformada === null) {
-    return;
-  }
-
-  if (senhaInformada !== SENHA_ADMIN) {
-    window.alert("Senha incorreta.");
-    return;
-  }
-
-  window.localStorage.setItem(CHAVE_ACESSO_ADMIN, SENHA_ADMIN);
-  window.open(obterUrlPainelAdmin(), "_blank", "noopener");
-}
-
-function salvarCredenciaisClienteLocalmente(cliente) {
-  window.localStorage.setItem(CHAVE_CLIENTE, JSON.stringify(cliente));
-}
-
-function restaurarCredenciaisCliente() {
-  try {
-    const clienteSalvo = JSON.parse(
-      window.localStorage.getItem(CHAVE_CLIENTE) || "null",
-    );
-
-    if (!clienteSalvo?.nomeCliente || !clienteSalvo?.telefoneCliente) {
-      return null;
-    }
-
-    return clienteSalvo;
-  } catch (erro) {
-    return null;
-  }
-}
-
-function aplicarCredenciaisCliente(cliente) {
-  clienteLogado = cliente;
-  nomeLoginCliente.value = cliente.nomeCliente;
-  telefoneLoginCliente.value = cliente.telefoneCliente;
-  botaoSairCliente.classList.remove("oculto");
-
-  campoNome.value = cliente.nomeCliente;
-  campoTelefone.value = cliente.telefoneCliente;
-  atualizarResumo();
-}
-
-function limparAcessoCliente() {
-  clienteLogado = null;
-  nomeLoginCliente.value = "";
-  telefoneLoginCliente.value = "";
-  campoNome.value = "";
-  campoTelefone.value = "";
-  botaoSairCliente.classList.add("oculto");
-  painelAgendamentosCliente.classList.add("oculto");
-  painelHistoricoCliente.classList.add("oculto");
-  listaAgendamentosCliente.innerHTML = "";
-  listaHistoricoCliente.innerHTML = "";
-  limparMensagemLogin();
-  window.localStorage.removeItem(CHAVE_CLIENTE);
-  atualizarResumo();
-}
-
-function renderizarListaAgendamentosCliente(agendamentos) {
-  if (!agendamentos.length) {
-    painelAgendamentosCliente.classList.remove("oculto");
-    listaAgendamentosCliente.innerHTML = `
-            <article class="item-agendamento-cliente item-agendamento-cliente-vazio">
-                <strong>Nenhum horario futuro encontrado.</strong>
-                <p>Se voce acabou de agendar, atualize em alguns segundos ou confira nome e telefone informados.</p>
-            </article>
-        `;
-    return;
-  }
-
-  painelAgendamentosCliente.classList.remove("oculto");
-  listaAgendamentosCliente.innerHTML = agendamentos
-    .map(
-      (agendamento) => `
-        <article class="item-agendamento-cliente">
-            <div class="item-agendamento-cliente-topo">
-                <strong>${agendamento.servico}</strong>
-                <span>${agendamento.horarioAgendamento}</span>
-            </div>
-            <p>${formatarDataHoraAgendamento(agendamento.dataAgendamento, agendamento.horarioAgendamento)}</p>
-            <button class="botao-secundario botao-cancelar-cliente" type="button" data-id="${Number(agendamento.id)}">
-                Cancelar meu agendamento
-            </button>
-        </article>
-    `,
-    )
-    .join("");
-}
-
-function renderizarHistoricoCliente(historico) {
-  painelHistoricoCliente.classList.remove("oculto");
-
-  if (!historico.length) {
-    listaHistoricoCliente.innerHTML = `
-            <article class="item-agendamento-cliente item-agendamento-cliente-vazio">
-                <strong>Nenhum historico encontrado.</strong>
-                <p>Assim que houver atendimento salvo para este cliente, ele aparecera aqui.</p>
-            </article>
-        `;
-    return;
-  }
-
-  listaHistoricoCliente.innerHTML = historico
-    .map(
-      (agendamento) => `
-        <article class="item-agendamento-cliente">
-            <div class="item-agendamento-cliente-topo">
-                <strong>${agendamento.servico}</strong>
-                <span class="tag-historico-status ${obterClasseStatusHistorico(agendamento)}">${formatarStatusHistorico(agendamento)}</span>
-            </div>
-            <p>${formatarDataHoraAgendamento(agendamento.dataAgendamento, agendamento.horarioAgendamento)}</p>
-            <button class="botao-secundario botao-reagendar-cliente" type="button" data-servico="${agendamento.servico}">
-                Agendar este servico novamente
-            </button>
-        </article>
-    `,
-    )
-    .join("");
-}
-
 async function carregarAgendamentosCliente() {
-  if (!clienteLogado) {
-    return;
-  }
+  if (!clienteLogado) return;
 
   mostrarMensagemLogin("Localizando seus agendamentos...", "informacao");
 
   try {
     const parametros = new URLSearchParams(clienteLogado);
-    const resposta = await fetch(
+    const dados = await apiFetch(
       obterUrlApi(`/api/meus-agendamentos?${parametros.toString()}`),
     );
-    const tipoConteudo = resposta.headers.get("content-type") || "";
-
-    if (!tipoConteudo.includes("application/json")) {
-      throw new Error(
-        "A API nao respondeu em JSON. Rode o Node em http://127.0.0.1:3000.",
-      );
-    }
-
-    const dados = await resposta.json();
-
-    if (!resposta.ok) {
-      throw new Error(
-        dados.erro || "Nao foi possivel localizar seus agendamentos.",
-      );
-    }
-
     renderizarListaAgendamentosCliente(dados.agendamentos || []);
     mostrarMensagemLogin(
       "Acesso liberado. Voce pode cancelar seu proprio agendamento por aqui.",
@@ -971,33 +907,15 @@ async function carregarAgendamentosCliente() {
 }
 
 async function carregarHistoricoCliente() {
-  if (!clienteLogado) {
-    return;
-  }
+  if (!clienteLogado) return;
 
   try {
     const parametros = new URLSearchParams(clienteLogado);
-    const resposta = await fetch(
+    const dados = await apiFetch(
       obterUrlApi(`/api/historico-cliente?${parametros.toString()}`),
     );
-    const tipoConteudo = resposta.headers.get("content-type") || "";
-
-    if (!tipoConteudo.includes("application/json")) {
-      throw new Error(
-        "A API nao respondeu em JSON. Rode o Node em http://127.0.0.1:3000.",
-      );
-    }
-
-    const dados = await resposta.json();
-
-    if (!resposta.ok) {
-      throw new Error(
-        dados.erro || "Nao foi possivel localizar seu historico.",
-      );
-    }
-
     renderizarHistoricoCliente(dados.historico || []);
-  } catch (erro) {
+  } catch {
     painelHistoricoCliente.classList.add("oculto");
     listaHistoricoCliente.innerHTML = "";
   }
@@ -1028,35 +946,20 @@ async function entrarCliente() {
 }
 
 async function cancelarAgendamentoCliente(idAgendamento, botao) {
-  if (!clienteLogado) {
-    return;
-  }
+  if (!clienteLogado) return;
 
   botao.disabled = true;
   botao.textContent = "Cancelando...";
 
   try {
-    const resposta = await fetch(
+    const dados = await apiFetch(
       obterUrlApi(`/api/agendamentos/${idAgendamento}/cancelar`),
       {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(clienteLogado),
       },
     );
-    const tipoConteudo = resposta.headers.get("content-type") || "";
-
-    if (!tipoConteudo.includes("application/json")) {
-      throw new Error("A API nao respondeu em JSON ao cancelar o agendamento.");
-    }
-
-    const dados = await resposta.json();
-
-    if (!resposta.ok) {
-      throw new Error(dados.erro || "Nao foi possivel cancelar o agendamento.");
-    }
 
     mostrarMensagemLogin(dados.mensagem, "sucesso");
     await carregarDatasOcupadas();
@@ -1101,11 +1004,9 @@ async function salvarListaEspera() {
   botaoEntrarListaEspera.textContent = "Salvando...";
 
   try {
-    const resposta = await fetch(obterUrlApi("/api/lista-espera"), {
+    const dados = await apiFetch(obterUrlApi("/api/lista-espera"), {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nomeCliente,
         telefoneCliente,
@@ -1114,21 +1015,6 @@ async function salvarListaEspera() {
         observacoes: observacoesListaEspera.value.trim(),
       }),
     });
-    const tipoConteudo = resposta.headers.get("content-type") || "";
-
-    if (!tipoConteudo.includes("application/json")) {
-      throw new Error(
-        "A API nao respondeu em JSON. Rode o Node em http://127.0.0.1:3000.",
-      );
-    }
-
-    const dados = await resposta.json();
-
-    if (!resposta.ok) {
-      throw new Error(
-        dados.erro || "Nao foi possivel entrar na lista de espera.",
-      );
-    }
 
     mostrarMensagemListaEspera(dados.mensagem, "sucesso");
     observacoesListaEspera.value = "";
@@ -1140,39 +1026,8 @@ async function salvarListaEspera() {
   }
 }
 
-function selecionarServicoPorNome(nomeServico) {
-  const entrada = Array.from(entradasServico).find(
-    (item) => item.value === nomeServico,
-  );
-
-  if (!entrada) {
-    return false;
-  }
-
-  selecionarServico(entrada);
-  return true;
-}
-
-function prepararReagendamento(nomeServico) {
-  if (!selecionarServicoPorNome(nomeServico)) {
-    return;
-  }
-
-  dataSelecionada = "";
-  horarioSelecionado = "";
-  campoData.value = "";
-  painelSucessoAtivo = false;
-  limparPainelSucesso();
-  renderizarDatas();
-  prepararHorariosSemData();
-  mostrarSecaoHorarios(MODO_SIMPLES);
-  atualizarResumo();
-}
-
 async function salvarAgendamento() {
-  if (!servicoSelecionado || !dataSelecionada || !horarioSelecionado) {
-    return;
-  }
+  if (!servicoSelecionado || !dataSelecionada || !horarioSelecionado) return;
 
   const nomeCliente = obterNomeCliente();
   const telefoneCliente = obterTelefoneCliente();
@@ -1197,27 +1052,11 @@ async function salvarAgendamento() {
       horarioAgendamento: horarioSelecionado,
     };
 
-    const resposta = await fetch(obterUrlApi("/api/agendamentos"), {
+    const dados = await apiFetch(obterUrlApi("/api/agendamentos"), {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(agendamentoParaSalvar),
     });
-
-    const tipoConteudo = resposta.headers.get("content-type") || "";
-
-    if (!tipoConteudo.includes("application/json")) {
-      throw new Error(
-        "A API nao respondeu em JSON. Rode o Node em http://127.0.0.1:3000.",
-      );
-    }
-
-    const dados = await resposta.json();
-
-    if (!resposta.ok) {
-      throw new Error(dados.erro || "Nao foi possivel salvar o agendamento.");
-    }
 
     aplicarCredenciaisCliente({ nomeCliente, telefoneCliente });
     salvarCredenciaisClienteLocalmente({ nomeCliente, telefoneCliente });
@@ -1225,6 +1064,7 @@ async function salvarAgendamento() {
     if (!MODO_SIMPLES) {
       await carregarAreaCliente();
     }
+
     await carregarDatasOcupadas();
 
     const agendamentoConfirmado = {
@@ -1237,9 +1077,7 @@ async function salvarAgendamento() {
     resetarFormulario(true);
   } catch (erro) {
     mostrarMensagem(erro.message, "erro");
-
     await carregarDatasOcupadas();
-
     if (dataSelecionada) {
       await carregarHorariosDaData(dataSelecionada);
     }
@@ -1249,51 +1087,22 @@ async function salvarAgendamento() {
   }
 }
 
-function resetarFormulario(preservarPainelSucesso = false) {
-  entradasServico.forEach((entrada) => {
-    entrada.checked = false;
-  });
-
-  cartoesServico.forEach((cartao) => {
-    cartao.classList.remove("esta-selecionado");
-  });
-
-  servicoSelecionado = null;
-  dataSelecionada = "";
-  horarioSelecionado = "";
-  campoData.value = "";
-
-  campoNome.value = clienteLogado?.nomeCliente || "";
-  campoTelefone.value = clienteLogado?.telefoneCliente || "";
-
-  botaoAbrirAgendamento.classList.add("oculto");
-  secaoHorarios.classList.add("oculto");
-
-  if (!preservarPainelSucesso) {
-    painelSucessoAtivo = false;
-    limparPainelSucesso();
-    secaoConfirmacao.classList.add("oculto");
-  }
-
-  prepararHorariosSemData();
-  renderizarDatas();
-  atualizarResumo();
-}
+// ================= EVENT LISTENERS =================
 
 entradasServico.forEach((entrada) => {
-  entrada.addEventListener("change", () => {
-    selecionarServico(entrada);
-  });
+  entrada.addEventListener("change", () => selecionarServico(entrada));
 });
 
 botaoAbrirAgendamento.addEventListener("click", () =>
   mostrarSecaoHorarios(true),
 );
 botaoEscolherData.addEventListener("click", abrirCalendarioCompleto);
+
 campoNome.addEventListener("input", () => {
   atualizarResumo();
   tentarGuiarConfirmacaoModoSimples();
 });
+
 campoTelefone.addEventListener("input", () => {
   atualizarResumo();
   tentarGuiarConfirmacaoModoSimples();
@@ -1305,21 +1114,13 @@ campoData.addEventListener("change", async (evento) => {
 
 gradeDatas.addEventListener("click", async (evento) => {
   const botao = evento.target.closest(".botao-data");
-
-  if (!botao || botao.disabled) {
-    return;
-  }
-
+  if (!botao || botao.disabled) return;
   await selecionarData(botao.dataset.data);
 });
 
 gradeHorarios.addEventListener("click", (evento) => {
   const botao = evento.target.closest(".botao-horario");
-
-  if (!botao) {
-    return;
-  }
-
+  if (!botao) return;
   selecionarHorario(botao);
 });
 
@@ -1327,11 +1128,9 @@ botaoConfirmar.addEventListener("click", salvarAgendamento);
 botaoLoginCliente.addEventListener("click", entrarCliente);
 botaoSairCliente.addEventListener("click", limparAcessoCliente);
 botaoEntrarListaEspera.addEventListener("click", salvarListaEspera);
-botaoAdicionarCalendario.addEventListener("click", () => {
-  if (!ultimoAgendamentoConfirmado) {
-    return;
-  }
 
+botaoAdicionarCalendario.addEventListener("click", () => {
+  if (!ultimoAgendamentoConfirmado) return;
   const conteudo = criarConteudoCalendario(ultimoAgendamentoConfirmado);
   baixarArquivo(
     "agendamento-barber-shop-custom.ics",
@@ -1339,6 +1138,7 @@ botaoAdicionarCalendario.addEventListener("click", () => {
     "text/calendar;charset=utf-8;",
   );
 });
+
 botaoNovoAgendamento.addEventListener("click", () => {
   resetarFormulario();
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1346,21 +1146,13 @@ botaoNovoAgendamento.addEventListener("click", () => {
 
 listaAgendamentosCliente.addEventListener("click", async (evento) => {
   const botao = evento.target.closest(".botao-cancelar-cliente");
-
-  if (!botao) {
-    return;
-  }
-
+  if (!botao) return;
   await cancelarAgendamentoCliente(Number(botao.dataset.id), botao);
 });
 
 listaHistoricoCliente.addEventListener("click", (evento) => {
   const botao = evento.target.closest(".botao-reagendar-cliente");
-
-  if (!botao) {
-    return;
-  }
-
+  if (!botao) return;
   prepararReagendamento(botao.dataset.servico);
 });
 
@@ -1375,6 +1167,8 @@ if (botaoToggleAreaCliente) {
   );
 }
 
+// ================= INICIALIZAÇÃO =================
+
 renderizarHorarios();
 definirDataMinima();
 prepararHorariosSemData();
@@ -1383,10 +1177,8 @@ aplicarModoSimples();
 carregarDatasOcupadas();
 
 const clienteSalvo = restaurarCredenciaisCliente();
-
 if (clienteSalvo) {
   aplicarCredenciaisCliente(clienteSalvo);
-
   if (!MODO_SIMPLES) {
     carregarAreaCliente();
   }
