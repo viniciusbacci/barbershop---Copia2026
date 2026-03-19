@@ -1,3 +1,5 @@
+// v2
+// ================= SELETORES =================
 // ================= SELETORES =================
 const cartoesServico = document.querySelectorAll(".cartao-servico");
 const entradasServico = document.querySelectorAll('input[name="servico"]');
